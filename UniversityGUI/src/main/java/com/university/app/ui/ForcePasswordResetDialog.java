@@ -26,7 +26,9 @@ public class ForcePasswordResetDialog extends JDialog {
 
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(e -> resetPassword());
-        add(saveButton);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(saveButton);
+        add(buttonPanel);
 
         pack();
         setLocationRelativeTo(owner);

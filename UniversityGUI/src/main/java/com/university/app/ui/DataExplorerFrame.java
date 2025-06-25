@@ -51,15 +51,14 @@ public class DataExplorerFrame extends JFrame {
         // Main content panel (for tables)
         mainContentPanel = new JPanel(new BorderLayout());
         
-        JToolBar crudToolbar = new JToolBar();
-        crudToolbar.setFloatable(false);
+        JPanel crudPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         addButton = new JButton("Add");
         updateButton = new JButton("Update");
         deleteButton = new JButton("Delete");
-        crudToolbar.add(addButton);
-        crudToolbar.add(updateButton);
-        crudToolbar.add(deleteButton);
-        mainContentPanel.add(crudToolbar, BorderLayout.NORTH);
+        crudPanel.add(addButton);
+        crudPanel.add(updateButton);
+        crudPanel.add(deleteButton);
+        mainContentPanel.add(crudPanel, BorderLayout.NORTH);
 
         addButton.addActionListener(e -> openDynamicDialog(null));
         updateButton.addActionListener(e -> openDynamicDialog(getSelectedRowData()));

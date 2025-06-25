@@ -56,10 +56,14 @@ public class DynamicRecordDialog extends JDialog {
             gbc.fill = GridBagConstraints.NONE;
             JButton saveButton = new JButton("Save");
             saveButton.addActionListener(e -> saveRecord());
-            add(saveButton, gbc);
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            buttonPanel.add(saveButton);
+            gbc.gridwidth = 2;
+            gbc.gridx = 0;
+            add(buttonPanel, gbc);
 
             pack();
-            setMinimumSize(getSize()); // Ensure window doesn't get too small
+            setMinimumSize(new Dimension(Math.max(400, getWidth()), Math.max(200, getHeight())));
             setLocationRelativeTo(owner);
 
         } catch (SQLException e) {

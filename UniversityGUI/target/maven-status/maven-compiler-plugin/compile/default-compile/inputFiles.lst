@@ -6,6 +6,7 @@
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/db/DatabaseConnector.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/PasswordRequestPanel.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/DatabaseDAO.java
+/home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/BackgroundPanel.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/UserManagementPanel.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/AddUserDialog.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/UserDAO.java
