@@ -1,7 +1,7 @@
 package com.university.app.ui;
 
 import com.university.app.App;
-import com.university.app.dao.DatabaseDAO;
+// import com.university.app.dao.DatabaseDAO;
 import com.university.app.dao.GenericDAO;
 import com.university.app.dao.PasswordRequestDAO;
 import com.university.app.dao.TableViewerDAO;
@@ -48,7 +48,12 @@ public class MainFrame extends JFrame {
         mainPanel.add(new UserManagementPanel(), "USER_MANAGEMENT");
         mainPanel.add(new PasswordRequestPanel(), "PASSWORD_REQUESTS");
         mainPanel.add(new JLabel("Welcome, Admin!", SwingConstants.CENTER), "HOME");
-        add(mainPanel, BorderLayout.CENTER);
+
+        // Load background image
+        ImageIcon bgIcon = new ImageIcon(getClass().getClassLoader().getResource("images/ysFxGz.jpg"));
+        BackgroundPanel backgroundPanel = new BackgroundPanel(bgIcon.getImage());
+        backgroundPanel.add(mainPanel, BorderLayout.CENTER);
+        setContentPane(backgroundPanel);
 
         JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         JButton dataExplorerButton = new JButton("Data Explorer");
@@ -69,7 +74,7 @@ public class MainFrame extends JFrame {
         changePasswordButton.addActionListener(e -> new ChangePasswordDialog(this).setVisible(true));
         logoutButton.addActionListener(e -> App.showLogin());
 
-        add(bottomButtonPanel, BorderLayout.SOUTH);
+        backgroundPanel.add(bottomButtonPanel, BorderLayout.SOUTH);
         cardLayout.show(mainPanel, "HOME"); // Default view for admin
     }
     
