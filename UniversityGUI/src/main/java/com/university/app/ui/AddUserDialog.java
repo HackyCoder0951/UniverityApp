@@ -14,7 +14,7 @@ public class AddUserDialog extends JDialog {
 
     public AddUserDialog(Frame owner) {
         super(owner, "Add New User", true);
-        setLayout(new GridLayout(4, 2));
+        setLayout(new GridLayout(4, 4));
 
         add(new JLabel("Username:"));
         usernameField = new JTextField();
