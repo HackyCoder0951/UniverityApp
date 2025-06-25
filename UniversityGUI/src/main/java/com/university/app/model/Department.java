@@ -1,29 +1,17 @@
 package com.university.app.model;
 
-/**
- * Represents a department in the university.
- * This model class is primarily used to populate dropdown menus (JComboBox)
- * to ensure data consistency when creating or updating records that
- * reference a department.
- */
 public class Department {
     private String deptName;
     private String building;
     private double budget;
 
-    /**
-     * Constructs a new Department with a specified name.
-     *
-     * @param deptName The name of the department.
-     */
-    public Department(String deptName) {
+    public Department(String deptName, String building, double budget) {
         this.deptName = deptName;
+        this.building = building;
+        this.budget = budget;
     }
 
     // Getters and Setters
-    /**
-     * @return The department's name.
-     */
     public String getDeptName() {
         return deptName;
     }
@@ -48,12 +36,6 @@ public class Department {
         this.budget = budget;
     }
 
-    /**
-     * Overridden to provide a user-friendly string representation,
-     * which is essential for display in JComboBox components.
-     *
-     * @return The name of the department.
-     */
     @Override
     public String toString() {
         return deptName; // This is important for JComboBox rendering

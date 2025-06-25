@@ -1,137 +1,132 @@
 package com.university.app.ui;
 
 import com.university.app.dao.DatabaseDAO;
-import com.university.app.dao.GenericDAO;
 import com.university.app.dao.TableViewerDAO;
+import com.university.app.dao.GenericDAO;
+// import com.university.app.dao.UserDAO;
+// import com.university.app.model.User;
+// import com.university.app.service.UserSession;
 
 import javax.swing.*;
-import javax.swing.table.TableModel;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.sql.SQLException;
 
-/**
- * A dedicated window for admin users to explore and manage data in any table.
- * It features a list of all database tables and a viewer to display the data,
- * along with full CRUD (Create, Read, Update, Delete) capabilities.
- */
 public class DataExplorerFrame extends JFrame {
     private JList<String> tableList;
-    private JTable dataTable;
-    private final DatabaseDAO databaseDAO = new DatabaseDAO();
-    private final TableViewerDAO tableViewerDAO = new TableViewerDAO();
-    private final GenericDAO genericDAO = new GenericDAO();
+    private JPanel mainContentPanel;
+    private TableViewerDAO tableViewerDAO;
+    private GenericDAO genericDAO;
+    private String currentTable;
+    private JTable currentJTable;
+    private JButton addButton, updateButton, deleteButton;
 
-    /**
-     * Constructs the Data Explorer window.
-     */
     public DataExplorerFrame() {
         setTitle("Data Explorer");
-        setSize(1000, 700);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only this window
-        setLocationRelativeTo(null);
+        setSize(1024, 768);
+        setLocationRelativeTo(null); // Center on screen
+        setLayout(new BorderLayout(10, 10));
 
-        // Main layout with a split pane
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(200);
+        tableViewerDAO = new TableViewerDAO();
+        genericDAO = new GenericDAO();
 
-        // Left panel: List of all database tables
-        List<String> allTables = databaseDAO.getAllTableNames();
+        // Sidebar with table list
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        for(String table : allTables) {
-            listModel.addElement(table);
-        }
+        populateTableList(listModel);
+        
         tableList = new JList<>(listModel);
         tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                viewTable(tableList.getSelectedValue());
+                displayTableData(tableList.getSelectedValue());
             }
         });
-        splitPane.setLeftComponent(new JScrollPane(tableList));
 
-        // Right panel: Table data viewer
-        dataTable = new JTable();
-        dataTable.setFillsViewportHeight(true);
-        JScrollPane tableScrollPane = new JScrollPane(dataTable);
-        splitPane.setRightComponent(tableScrollPane);
-        add(splitPane, BorderLayout.CENTER);
+        JScrollPane sidebarScrollPane = new JScrollPane(tableList);
+        sidebarScrollPane.setPreferredSize(new Dimension(200, 0));
+        add(sidebarScrollPane, BorderLayout.WEST);
 
-        // Bottom panel for CRUD buttons
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton addButton = new JButton("Add");
-        addButton.addActionListener(e -> addRecord());
-        bottomPanel.add(addButton);
+        // Main content panel (for tables)
+        mainContentPanel = new JPanel(new BorderLayout());
+        
+        JToolBar crudToolbar = new JToolBar();
+        crudToolbar.setFloatable(false);
+        addButton = new JButton("Add");
+        updateButton = new JButton("Update");
+        deleteButton = new JButton("Delete");
+        crudToolbar.add(addButton);
+        crudToolbar.add(updateButton);
+        crudToolbar.add(deleteButton);
+        mainContentPanel.add(crudToolbar, BorderLayout.NORTH);
 
-        JButton updateButton = new JButton("Update");
-        updateButton.addActionListener(e -> updateRecord());
-        bottomPanel.add(updateButton);
+        addButton.addActionListener(e -> openDynamicDialog(null));
+        updateButton.addActionListener(e -> openDynamicDialog(getSelectedRowData()));
+        deleteButton.addActionListener(e -> deleteSelectedRecord());
 
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.addActionListener(e -> deleteRecord());
-        bottomPanel.add(deleteButton);
-
-        add(bottomPanel, BorderLayout.SOUTH);
+        add(mainContentPanel, BorderLayout.CENTER);
+        
+        if (listModel.getSize() > 0) {
+            tableList.setSelectedIndex(0);
+        }
     }
 
-    /**
-     * Displays the data for the selected table in the main data table.
-     * @param tableName The name of the table to display.
-     */
-    private void viewTable(String tableName) {
+    private void displayTableData(String tableName) {
         if (tableName == null) return;
-        TableModel model = tableViewerDAO.getTableData(tableName);
-        dataTable.setModel(model);
+        this.currentTable = tableName;
+
+        Component[] components = mainContentPanel.getComponents();
+        for (Component component : components) {
+            if (component instanceof JScrollPane) {
+                mainContentPanel.remove(component);
+            }
+        }
+
+        JTable table = new JTable(tableViewerDAO.getTableModelFor(tableName));
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        this.currentJTable = table; // Keep a reference to the current table
+        mainContentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
+        mainContentPanel.revalidate();
+        mainContentPanel.repaint();
+        updateCrudButtonState();
+    }
+    
+    private void updateCrudButtonState() {
+        // In the admin's data explorer, all buttons are always visible.
+        // For entry users, this logic is handled within MainFrame.
+        addButton.setVisible(true);
+        updateButton.setVisible(true);
+        deleteButton.setVisible(true);
     }
 
-    // --- CRUD Methods ---
-
-    /**
-     * Opens a dynamic dialog to add a new record to the currently selected table.
-     */
-    private void addRecord() {
-        String selectedTable = tableList.getSelectedValue();
-        if (selectedTable == null) {
-            JOptionPane.showMessageDialog(this, "Please select a table first.", "Warning", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        DynamicRecordDialog dialog = new DynamicRecordDialog(this, selectedTable, null);
+    private void openDynamicDialog(Map<String, Object> initialData) {
+        if (currentTable == null) return;
+        DynamicRecordDialog dialog = new DynamicRecordDialog(this, currentTable, initialData);
         dialog.setVisible(true);
-        viewTable(selectedTable); // Refresh table after dialog closes
+        displayTableData(currentTable); // Refresh table after dialog closes
     }
 
-    /**
-     * Opens a dynamic dialog to update the selected record in the current table.
-     */
-    private void updateRecord() {
-        String selectedTable = tableList.getSelectedValue();
-        int selectedRow = dataTable.getSelectedRow();
-
-        if (selectedTable == null || selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a record to update.", "Warning", JOptionPane.WARNING_MESSAGE);
-            return;
+    private Map<String, Object> getSelectedRowData() {
+        if (currentJTable == null || currentJTable.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a row to update.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return null;
         }
 
-        Map<String, Object> recordData = new HashMap<>();
-        for (int i = 0; i < dataTable.getColumnCount(); i++) {
-            recordData.put(dataTable.getColumnName(i), dataTable.getValueAt(selectedRow, i));
+        Map<String, Object> rowData = new HashMap<>();
+        int selectedRow = currentJTable.getSelectedRow();
+        for (int i = 0; i < currentJTable.getColumnCount(); i++) {
+            String colName = currentJTable.getColumnName(i);
+            Object colValue = currentJTable.getValueAt(selectedRow, i);
+            rowData.put(colName, colValue);
         }
-
-        DynamicRecordDialog dialog = new DynamicRecordDialog(this, selectedTable, recordData);
-        dialog.setVisible(true);
-        viewTable(selectedTable); // Refresh table
+        return rowData;
     }
 
-    /**
-     * Deletes the selected record from the current table.
-     */
-    private void deleteRecord() {
-        String selectedTable = tableList.getSelectedValue();
-        int selectedRow = dataTable.getSelectedRow();
-
-        if (selectedTable == null || selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a record to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+    private void deleteSelectedRecord() {
+        Map<String, Object> rowData = getSelectedRowData();
+        if (rowData == null) {
+            // getSelectedRowData already showed a message
             return;
         }
 
@@ -141,40 +136,28 @@ public class DataExplorerFrame extends JFrame {
         }
 
         try {
-            // Get table metadata to find the primary key
-            Map<String, Object> metadata = genericDAO.getTableMetadata(selectedTable);
-            String pkColumnName = (String) metadata.get("primaryKey");
-
-            if (pkColumnName == null || pkColumnName.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Cannot delete: Table does not have a primary key defined.", "Error", JOptionPane.ERROR_MESSAGE);
+            Map<String, Object> whereClauses = new HashMap<>();
+            List<String> primaryKeys = genericDAO.getPrimaryKeys(currentTable);
+            if (primaryKeys.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Cannot delete record: No primary key defined for this table.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            // Find the column index of the primary key in the JTable
-            int pkColumnIndex = -1;
-            for (int i = 0; i < dataTable.getColumnCount(); i++) {
-                if (pkColumnName.equalsIgnoreCase(dataTable.getColumnName(i))) {
-                    pkColumnIndex = i;
-                    break;
-                }
+            for (String pk : primaryKeys) {
+                whereClauses.put(pk, rowData.get(pk));
             }
 
-            if (pkColumnIndex == -1) {
-                JOptionPane.showMessageDialog(this, "Cannot delete: Primary key column not found in the table view.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Get the value of the primary key from the selected row
-            Object pkValue = dataTable.getValueAt(selectedRow, pkColumnIndex);
-
-            // Call the generic DAO to delete the record
-            genericDAO.deleteRecord(selectedTable, pkColumnName, pkValue);
-
-            JOptionPane.showMessageDialog(this, "Record deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-            viewTable(selectedTable); // Refresh the table
-        } catch (Exception e) {
+            genericDAO.deleteRecord(currentTable, whereClauses);
+            JOptionPane.showMessageDialog(this, "Record deleted successfully!");
+            displayTableData(currentTable); // Refresh
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error deleting record: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
-}
+
+    private void populateTableList(DefaultListModel<String> listModel) {
+        DatabaseDAO databaseDAO = new DatabaseDAO();
+        List<String> tables = databaseDAO.getAllTableNames();
+        tables.forEach(listModel::addElement);
+    }
+} 

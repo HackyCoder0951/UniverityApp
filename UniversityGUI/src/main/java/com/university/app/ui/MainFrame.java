@@ -10,245 +10,193 @@ import com.university.app.model.User;
 import com.university.app.service.UserSession;
 
 import javax.swing.*;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * The main window of the application, displayed after a successful login.
- * The content and capabilities of this frame change based on the logged-in user's role.
- * - Admin users see a dashboard with administrative panels.
- * - Entry/Reporting users see a data viewer/editor for their permitted tables.
- */
 public class MainFrame extends JFrame {
-    private final UserSession session = UserSession.getInstance();
-    private final User currentUser = session.getCurrentUser();
-
-    // UI components for data viewing roles
-    private JList<String> tableList;
-    private JTable dataTable;
-    private JScrollPane tableScrollPane;
-
-    // DAOs
-    private final DatabaseDAO databaseDAO = new DatabaseDAO();
-    private final TableViewerDAO tableViewerDAO = new TableViewerDAO();
-    private final GenericDAO genericDAO = new GenericDAO();
-    private PasswordRequestDAO passwordRequestDAO = new PasswordRequestDAO();
-
-    // CRUD buttons
-    private JButton addButton, updateButton, deleteButton;
 
     // --- State for User UI ---
     private String currentTable;
     private JTable currentJTable;
+    private GenericDAO genericDAO = new GenericDAO();
+    private TableViewerDAO tableViewerDAO = new TableViewerDAO();
     private JPanel userMainContentPanel;
     private JButton userAddButton, userUpdateButton, userDeleteButton;
     // --- End State for User UI ---
 
-    /**
-     * Constructs the main frame. It initializes the UI based on the user's role.
-     */
     public MainFrame() {
-        setTitle("University ERP - " + currentUser.getRole() + " (" + currentUser.getUsername() + ")");
-        setSize(1000, 700);
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        if (currentUser != null && "admin".equals(currentUser.getRole())) {
+            buildAdminUI();
+        } else {
+            buildUserUI();
+        }
+    }
+
+    private void buildAdminUI() {
+        setTitle("University ERP - Admin Dashboard");
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
-        // Build the UI based on user role
-        if ("admin".equals(currentUser.getRole())) {
-            createAdminUI();
-        } else {
-            createDataUserUI();
-        }
-    }
-
-    /**
-     * Creates the UI for 'admin' users.
-     * This UI consists of a tabbed pane with User Management and Password Request panels.
-     */
-    private void createAdminUI() {
-        JTabbedPane tabbedPane = new JTabbedPane();
-
-        // User Management Panel
-        tabbedPane.addTab("User Management", new UserManagementPanel());
-
-        // Password Requests Panel
-        tabbedPane.addTab("Password Requests", new PasswordRequestPanel());
-
-        // A panel for main actions like Logout and Data Explorer
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton dataExplorerButton = new JButton("Data Explorer");
-        dataExplorerButton.addActionListener(e -> new DataExplorerFrame().setVisible(true));
-        topPanel.add(dataExplorerButton);
-
-        JButton logoutButton = new JButton("Logout");
-        logoutButton.addActionListener(e -> logout());
-        topPanel.add(logoutButton);
-
-        // Add components to the frame
-        add(topPanel, BorderLayout.NORTH);
-        add(tabbedPane, BorderLayout.CENTER);
-    }
-
-    /**
-     * Creates the UI for non-admin users ('entry', 'reporting').
-     * This UI consists of a list of permitted tables and a data viewer.
-     */
-    private void createDataUserUI() {
-        // Main content split pane
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(200);
-
-        // Left panel: List of tables the user is permitted to see
-        List<String> permittedTables = session.getUserPermissions();
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-        if (permittedTables != null) {
-            for(String table : permittedTables) {
-                listModel.addElement(table);
-            }
-        }
-        tableList = new JList<>(listModel);
-        tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                viewTable(tableList.getSelectedValue());
-            }
-        });
-        splitPane.setLeftComponent(new JScrollPane(tableList));
-
-        // Right panel: Table data viewer
-        dataTable = new JTable();
-        dataTable.setFillsViewportHeight(true);
-        // Reporting users cannot edit data directly in the table, entry can.
-        dataTable.setEnabled("entry".equals(currentUser.getRole()));
-        tableScrollPane = new JScrollPane(dataTable);
-        splitPane.setRightComponent(tableScrollPane);
-
-        add(splitPane, BorderLayout.CENTER);
-
-        // Bottom panel for buttons (Logout, CRUD)
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-
-        // CRUD buttons are only visible to 'entry' role users
-        if ("entry".equals(currentUser.getRole())) {
-            addButton = new JButton("Add");
-            addButton.addActionListener(e -> addRecord());
-            bottomPanel.add(addButton);
-
-            updateButton = new JButton("Update");
-            updateButton.addActionListener(e -> updateRecord());
-            bottomPanel.add(updateButton);
-
-            deleteButton = new JButton("Delete");
-            deleteButton.addActionListener(e -> deleteRecord());
-            bottomPanel.add(deleteButton);
-        }
         
-        // All non-admin users can request a password change
-        JButton changePasswordButton = new JButton("Request Password Change");
-        changePasswordButton.addActionListener(e -> requestPasswordChange());
-        bottomPanel.add(changePasswordButton);
+        CardLayout cardLayout = new CardLayout();
+        JPanel mainPanel = new JPanel(cardLayout);
+        
+        mainPanel.add(new UserManagementPanel(), "USER_MANAGEMENT");
+        mainPanel.add(new PasswordRequestPanel(), "PASSWORD_REQUESTS");
+        mainPanel.add(new JLabel("Welcome, Admin!", SwingConstants.CENTER), "HOME");
+        add(mainPanel, BorderLayout.CENTER);
 
-
+        JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JButton dataExplorerButton = new JButton("Data Explorer");
+        JButton userManagementButton = new JButton("User Management");
+        JButton passwordRequestsButton = new JButton("Password Requests");
+        JButton changePasswordButton = new JButton("Change Password");
         JButton logoutButton = new JButton("Logout");
-        logoutButton.addActionListener(e -> logout());
-        bottomPanel.add(logoutButton);
-        add(bottomPanel, BorderLayout.SOUTH);
+
+        bottomButtonPanel.add(dataExplorerButton);
+        bottomButtonPanel.add(userManagementButton);
+        bottomButtonPanel.add(passwordRequestsButton);
+        bottomButtonPanel.add(changePasswordButton);
+        bottomButtonPanel.add(logoutButton);
+        
+        dataExplorerButton.addActionListener(e -> new DataExplorerFrame().setVisible(true));
+        userManagementButton.addActionListener(e -> cardLayout.show(mainPanel, "USER_MANAGEMENT"));
+        passwordRequestsButton.addActionListener(e -> cardLayout.show(mainPanel, "PASSWORD_REQUESTS"));
+        changePasswordButton.addActionListener(e -> new ChangePasswordDialog(this).setVisible(true));
+        logoutButton.addActionListener(e -> App.showLogin());
+
+        add(bottomButtonPanel, BorderLayout.SOUTH);
+        cardLayout.show(mainPanel, "HOME"); // Default view for admin
     }
     
-    /**
-     * Handles the process of a user requesting a password change.
-     */
-    private void requestPasswordChange() {
-        int response = JOptionPane.showConfirmDialog(this,
-                "This will send a password change request to an administrator. Are you sure?",
-                "Confirm Password Change Request",
-                JOptionPane.YES_NO_OPTION);
+    private void buildUserUI() {
+        setTitle("University ERP");
+        setSize(1024, 768);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
+        JPanel dataExplorerPanel = new JPanel(new BorderLayout(10, 10));
+        this.tableViewerDAO = new TableViewerDAO();
 
-        if (response == JOptionPane.YES_OPTION) {
-            try {
-                new PasswordRequestDAO().createRequest(currentUser.getId());
-                JOptionPane.showMessageDialog(this,
-                        "Your request has been sent to the administrator.",
-                        "Request Sent",
-                        JOptionPane.INFORMATION_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this,
-                        "There was an error sending your request: " + ex.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        UserDAO userDAO = new UserDAO();
+        userDAO.getPermissionsForUser(UserSession.getInstance().getCurrentUser().getUsername()).forEach(listModel::addElement);
+        
+        JList<String> tableList = new JList<>(listModel);
+        tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JScrollPane sidebarScrollPane = new JScrollPane(tableList);
+        sidebarScrollPane.setPreferredSize(new Dimension(200, 0));
+        dataExplorerPanel.add(sidebarScrollPane, BorderLayout.WEST);
+
+        userMainContentPanel = new JPanel(new BorderLayout());
+        dataExplorerPanel.add(userMainContentPanel, BorderLayout.CENTER);
+
+        tableList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                String selectedTable = tableList.getSelectedValue();
+                displayUserData(selectedTable);
+            }
+        });
+        
+        add(dataExplorerPanel, BorderLayout.CENTER);
+        
+        JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        
+        userAddButton = new JButton("Add");
+        userUpdateButton = new JButton("Update");
+        userDeleteButton = new JButton("Delete");
+        bottomButtonPanel.add(userAddButton);
+        bottomButtonPanel.add(userUpdateButton);
+        bottomButtonPanel.add(userDeleteButton);
+        
+        bottomButtonPanel.add(new JSeparator(SwingConstants.VERTICAL));
+
+        JButton changePasswordButton = new JButton("Request Password Change");
+        JButton logoutButton = new JButton("Logout");
+        bottomButtonPanel.add(changePasswordButton);
+        bottomButtonPanel.add(logoutButton);
+        add(bottomButtonPanel, BorderLayout.SOUTH);
+        
+        userAddButton.addActionListener(e -> openDynamicDialog(null));
+        userUpdateButton.addActionListener(e -> openDynamicDialog(getSelectedRowData()));
+        userDeleteButton.addActionListener(e -> deleteSelectedRecord());
+
+        changePasswordButton.addActionListener(e -> {
+            int response = JOptionPane.showConfirmDialog(this, "This will send a password change request to the administrator. Continue?", "Request Password Change", JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.YES_OPTION) {
+                try {
+                    new PasswordRequestDAO().createRequest(UserSession.getInstance().getCurrentUser().getUsername());
+                    JOptionPane.showMessageDialog(this, "Request sent successfully!");
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "Error sending request: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        logoutButton.addActionListener(e -> App.showLogin());
+    }
+
+    private void displayUserData(String tableName) {
+        if (tableName == null) return;
+        this.currentTable = tableName;
+
+        Component[] components = userMainContentPanel.getComponents();
+        for (Component component : components) {
+            if (component instanceof JScrollPane) {
+                userMainContentPanel.remove(component);
             }
         }
+
+        this.currentJTable = new JTable(tableViewerDAO.getTableModelFor(tableName));
+        this.currentJTable.setDefaultEditor(Object.class, null); // Always read-only for non-admins
+        userMainContentPanel.add(new JScrollPane(this.currentJTable), BorderLayout.CENTER);
+        userMainContentPanel.revalidate();
+        userMainContentPanel.repaint();
+
+        UserDAO userDAO = new UserDAO();
+        List<String> permissions = userDAO.getPermissionsForUser(UserSession.getInstance().getCurrentUser().getUsername());
+        boolean hasPermission = permissions.contains(tableName);
+        userAddButton.setVisible(hasPermission);
+        userUpdateButton.setVisible(hasPermission);
+        userDeleteButton.setVisible(hasPermission);
     }
 
-    /**
-     * Logs the current user out, clears the session, and returns to the login screen.
-     */
-    private void logout() {
-        App.showLogin();
-    }
+    private void openDynamicDialog(Map<String, Object> initialData) {
+        if (currentTable == null) return;
 
-    /**
-     * Displays the data for the selected table in the main data table.
-     * @param tableName The name of the table to display.
-     */
-    private void viewTable(String tableName) {
-        if (tableName == null) return;
-        TableModel model = tableViewerDAO.getTableData(tableName);
-        dataTable.setModel(model);
-    }
-
-    // --- CRUD Methods for 'entry' role ---
-
-    /**
-     * Opens a dynamic dialog to add a new record to the currently selected table.
-     */
-    private void addRecord() {
-        String selectedTable = tableList.getSelectedValue();
-        if (selectedTable == null) {
-            JOptionPane.showMessageDialog(this, "Please select a table first.", "Warning", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        DynamicRecordDialog dialog = new DynamicRecordDialog(this, selectedTable, null);
-        dialog.setVisible(true);
-        viewTable(selectedTable); // Refresh table after dialog closes
-    }
-
-    /**
-     * Opens a dynamic dialog to update the selected record in the current table.
-     */
-    private void updateRecord() {
-        String selectedTable = tableList.getSelectedValue();
-        int selectedRow = dataTable.getSelectedRow();
-
-        if (selectedTable == null || selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a record to update.", "Warning", JOptionPane.WARNING_MESSAGE);
+        if (initialData == null && currentJTable != null && currentJTable.getSelectedRow() != -1) {
+            JOptionPane.showMessageDialog(this, "Please select a row to update.", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Convert the selected JTable row to a map of data for the dialog
-        Map<String, Object> recordData = new HashMap<>();
-        for (int i = 0; i < dataTable.getColumnCount(); i++) {
-            recordData.put(dataTable.getColumnName(i), dataTable.getValueAt(selectedRow, i));
-        }
-
-        DynamicRecordDialog dialog = new DynamicRecordDialog(this, selectedTable, recordData);
+        DynamicRecordDialog dialog = new DynamicRecordDialog(this, currentTable, initialData);
         dialog.setVisible(true);
-        viewTable(selectedTable); // Refresh table
+        displayUserData(currentTable); 
     }
 
-    /**
-     * Deletes the selected record from the current table.
-     */
-    private void deleteRecord() {
-        String selectedTable = tableList.getSelectedValue();
-        int selectedRow = dataTable.getSelectedRow();
+    private Map<String, Object> getSelectedRowData() {
+        if (currentJTable == null || currentJTable.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a row to update.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
 
-        if (selectedTable == null || selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a record to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+        Map<String, Object> rowData = new HashMap<>();
+        int selectedRow = currentJTable.getSelectedRow();
+        for (int i = 0; i < currentJTable.getColumnCount(); i++) {
+            String colName = currentJTable.getColumnName(i);
+            Object colValue = currentJTable.getValueAt(selectedRow, i);
+            rowData.put(colName, colValue);
+        }
+        return rowData;
+    }
+
+    private void deleteSelectedRecord() {
+        Map<String, Object> rowData = getSelectedRowData();
+        if (rowData == null) {
             return;
         }
 
@@ -258,38 +206,20 @@ public class MainFrame extends JFrame {
         }
 
         try {
-            // Get table metadata to find the primary key
-            Map<String, Object> metadata = genericDAO.getTableMetadata(selectedTable);
-            String pkColumnName = (String) metadata.get("primaryKey");
-
-            if (pkColumnName == null || pkColumnName.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Cannot delete: Table does not have a primary key defined.", "Error", JOptionPane.ERROR_MESSAGE);
+            Map<String, Object> whereClauses = new HashMap<>();
+            List<String> primaryKeys = genericDAO.getPrimaryKeys(currentTable);
+            if (primaryKeys.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Cannot delete record: No primary key defined for this table.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            // Find the column index of the primary key
-            int pkColumnIndex = -1;
-            for (int i = 0; i < dataTable.getColumnCount(); i++) {
-                if (pkColumnName.equalsIgnoreCase(dataTable.getColumnName(i))) {
-                    pkColumnIndex = i;
-                    break;
-                }
+            for (String pk : primaryKeys) {
+                whereClauses.put(pk, rowData.get(pk));
             }
 
-            if (pkColumnIndex == -1) {
-                 JOptionPane.showMessageDialog(this, "Cannot delete: Primary key column not found in the table view.", "Error", JOptionPane.ERROR_MESSAGE);
-                 return;
-            }
-
-            // Get the value of the primary key from the selected row
-            Object pkValue = dataTable.getValueAt(selectedRow, pkColumnIndex);
-
-            // Call the generic DAO to delete the record
-            genericDAO.deleteRecord(selectedTable, pkColumnName, pkValue);
-
-            JOptionPane.showMessageDialog(this, "Record deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-            viewTable(selectedTable); // Refresh the table
-        } catch (Exception e) {
+            genericDAO.deleteRecord(currentTable, whereClauses);
+            JOptionPane.showMessageDialog(this, "Record deleted successfully!");
+            displayUserData(currentTable);
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error deleting record: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }

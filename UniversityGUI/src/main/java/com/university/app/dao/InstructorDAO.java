@@ -7,11 +7,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for handling CRUD operations for Instructor entities.
- * Note: This class was part of the initial static design and has been largely
- * superseded by the dynamic GenericDAO for all CRUD operations.
- */
 public class InstructorDAO {
 
     public List<Instructor> getAllInstructors() {
@@ -36,23 +31,15 @@ public class InstructorDAO {
         return instructors;
     }
 
-    /**
-     * Adds a new instructor to the database.
-     * @param instructor The Instructor object to add.
-     */
-    public void addInstructor(Instructor instructor) {
+    public void addInstructor(Instructor instructor) throws SQLException {
         String sql = "INSERT INTO instructor (ID, name, dept_name, salary) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, instructor.getId());
             pstmt.setString(2, instructor.getName());
             pstmt.setString(3, instructor.getDeptName());
             pstmt.setDouble(4, instructor.getSalary());
-
             pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 }
