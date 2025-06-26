@@ -38,93 +38,54 @@ public class MainFrame extends JFrame {
 
     private void buildAdminUI() {
         setTitle("University ERP - Admin Dashboard");
-        setSize(800, 600);
+        setSize(1024, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        
-        CardLayout cardLayout = new CardLayout();
-        JPanel mainPanel = new JPanel(cardLayout);
-        
-        mainPanel.add(new UserManagementPanel(), "USER_MANAGEMENT");
-        mainPanel.add(new PasswordRequestPanel(), "PASSWORD_REQUESTS");
-        mainPanel.add(new JLabel("Welcome, Admin!", SwingConstants.CENTER), "HOME");
+
+        // Create JTabbedPane for admin
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("User Management", new UserManagementPanel());
+        tabbedPane.addTab("Password Requests", new PasswordRequestPanel());
+        tabbedPane.addTab("Data Explorer", new DataExplorerPanel());
 
         // Load background image
         java.net.URL imgUrl = getClass().getClassLoader().getResource("images/ysFxGz.jpg");
-        /*System.out.println("Image URL: " + imgUrl);
-        if (imgUrl == null) {
-            JOptionPane.showMessageDialog(this, "Background image not found at images/ysFxGz.jpg!", "Image Error", JOptionPane.ERROR_MESSAGE);
-        }*/
         ImageIcon bgIcon = new ImageIcon(imgUrl);
         BackgroundPanel backgroundPanel = new BackgroundPanel(bgIcon.getImage());
-
-        mainPanel.setOpaque(false);
-        for (Component c : mainPanel.getComponents()) {
-            if (c instanceof JComponent) {
-                ((JComponent) c).setOpaque(false);
-            }
-        }
-
-        backgroundPanel.add(mainPanel, BorderLayout.CENTER);
+        backgroundPanel.setLayout(new BorderLayout());
+        backgroundPanel.add(tabbedPane, BorderLayout.CENTER);
         setContentPane(backgroundPanel);
-
-        JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        JButton dataExplorerButton = new JButton("Data Explorer");
-        JButton userManagementButton = new JButton("User Management");
-        JButton passwordRequestsButton = new JButton("Password Requests");
-        JButton changePasswordButton = new JButton("Change Password");
-        JButton logoutButton = new JButton("Logout");
-
-        bottomButtonPanel.add(dataExplorerButton);
-        bottomButtonPanel.add(userManagementButton);
-        bottomButtonPanel.add(passwordRequestsButton);
-        bottomButtonPanel.add(changePasswordButton);
-        bottomButtonPanel.add(logoutButton);
-        
-        dataExplorerButton.addActionListener(e -> new DataExplorerFrame().setVisible(true));
-        userManagementButton.addActionListener(e -> cardLayout.show(mainPanel, "USER_MANAGEMENT"));
-        passwordRequestsButton.addActionListener(e -> cardLayout.show(mainPanel, "PASSWORD_REQUESTS"));
-        changePasswordButton.addActionListener(e -> new ChangePasswordDialog(this).setVisible(true));
-        logoutButton.addActionListener(e -> App.showLogin());
-
-        backgroundPanel.add(bottomButtonPanel, BorderLayout.SOUTH);
-        cardLayout.show(mainPanel, "HOME"); // Default view for admin
     }
-    
+
     private void buildUserUI() {
         setTitle("University ERP");
         setSize(1024, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        
-        JPanel dataExplorerPanel = new JPanel(new BorderLayout(10, 10));
-        this.tableViewerDAO = new TableViewerDAO();
 
+        // Create JTabbedPane for entry/reporting users
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        // Data Entry Tab (existing sidebar/table view)
+        JPanel dataEntryPanel = new JPanel(new BorderLayout(10, 10));
+        this.tableViewerDAO = new TableViewerDAO();
         DefaultListModel<String> listModel = new DefaultListModel<>();
         UserDAO userDAO = new UserDAO();
         userDAO.getPermissionsForUser(UserSession.getInstance().getCurrentUser().getUsername()).forEach(listModel::addElement);
-        
         JList<String> tableList = new JList<>(listModel);
         tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
         JScrollPane sidebarScrollPane = new JScrollPane(tableList);
         sidebarScrollPane.setPreferredSize(new Dimension(200, 0));
-        dataExplorerPanel.add(sidebarScrollPane, BorderLayout.WEST);
-
+        dataEntryPanel.add(sidebarScrollPane, BorderLayout.WEST);
         userMainContentPanel = new JPanel(new BorderLayout());
-        dataExplorerPanel.add(userMainContentPanel, BorderLayout.CENTER);
-
+        dataEntryPanel.add(userMainContentPanel, BorderLayout.CENTER);
         tableList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 String selectedTable = tableList.getSelectedValue();
                 displayUserData(selectedTable);
             }
         });
-        
-        add(dataExplorerPanel, BorderLayout.CENTER);
-        
         JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        
         userAddButton = new JButton("Add");
         userUpdateButton = new JButton("Update");
         userDeleteButton = new JButton("Delete");
@@ -133,20 +94,16 @@ public class MainFrame extends JFrame {
         bottomButtonPanel.add(userUpdateButton);
         bottomButtonPanel.add(userDeleteButton);
         bottomButtonPanel.add(userRefreshButton);
-        
         bottomButtonPanel.add(new JSeparator(SwingConstants.VERTICAL));
-
         JButton changePasswordButton = new JButton("Request Password Change");
         JButton logoutButton = new JButton("Logout");
         bottomButtonPanel.add(changePasswordButton);
         bottomButtonPanel.add(logoutButton);
-        add(bottomButtonPanel, BorderLayout.SOUTH);
-        
+        dataEntryPanel.add(bottomButtonPanel, BorderLayout.SOUTH);
         userAddButton.addActionListener(e -> openDynamicDialog(null));
         userUpdateButton.addActionListener(e -> openDynamicDialog(getSelectedRowData()));
         userDeleteButton.addActionListener(e -> deleteSelectedRecord());
         userRefreshButton.addActionListener(e -> displayUserData(currentTable));
-
         changePasswordButton.addActionListener(e -> {
             int response = JOptionPane.showConfirmDialog(this, "This will send a password change request to the administrator. Continue?", "Request Password Change", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
@@ -159,6 +116,14 @@ public class MainFrame extends JFrame {
             }
         });
         logoutButton.addActionListener(e -> App.showLogin());
+        tabbedPane.addTab("Data Entry", dataEntryPanel);
+
+        // Marks Entry Tab
+        tabbedPane.addTab("Marks Entry", new MarksEntryPanel());
+        // Results View Tab
+        tabbedPane.addTab("Results View", new ResultViewPanel());
+
+        add(tabbedPane, BorderLayout.CENTER);
     }
 
     private void displayUserData(String tableName) {

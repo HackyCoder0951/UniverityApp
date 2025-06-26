@@ -1,7 +1,9 @@
 package com.university.app.ui;
 
 import com.university.app.dao.ResultDAO;
+import com.university.app.dao.StudentDAO;
 import com.university.app.model.Result;
+import com.university.app.model.Student;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -15,13 +17,24 @@ public class ResultViewPanel extends JPanel {
     private JButton searchButton;
     private JTable resultTable;
     private ResultDAO resultDAO;
+    private StudentDAO studentDAO;
+    private java.util.Map<String, String> displayToIdMap;
 
-    public ResultViewPanel(List<String> students) {
+    public ResultViewPanel() {
         super(new BorderLayout(10, 10));
         resultDAO = new ResultDAO();
+        studentDAO = new StudentDAO();
+        displayToIdMap = new java.util.HashMap<>();
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         filterPanel.add(new JLabel("Student:"));
-        studentCombo = new JComboBox<>(students.toArray(new String[0]));
+        java.util.List<Student> students = studentDAO.getAllStudents();
+        java.util.List<String> displayList = new java.util.ArrayList<>();
+        for (Student s : students) {
+            String display = s.getId() + " - " + s.getName();
+            displayList.add(display);
+            displayToIdMap.put(display, s.getId());
+        }
+        studentCombo = new JComboBox<>(displayList.toArray(new String[0]));
         filterPanel.add(studentCombo);
         filterPanel.add(new JLabel("Semester:"));
         semesterCombo = new JComboBox<>(new String[]{"Spring", "Summer", "Fall", "Winter", "Annual"});
@@ -44,12 +57,13 @@ public class ResultViewPanel extends JPanel {
 
     private void loadResults() {
         try {
-            String studentId = (String) studentCombo.getSelectedItem();
+            String display = (String) studentCombo.getSelectedItem();
+            String studentId = displayToIdMap.get(display);
             String semester = (String) semesterCombo.getSelectedItem();
             String resultType = (String) resultTypeCombo.getSelectedItem();
             int year = Integer.parseInt(yearField.getText());
-            List<Result> results = new ResultDAO().getResultsByType(studentId, resultType);
-            DefaultTableModel model = new DefaultTableModel(
+            java.util.List<Result> results = new ResultDAO().getResultsByType(studentId, resultType);
+            javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(
                 new String[]{"Semester", "Year", "SGPA", "CGPA", "Total Credits", "Type"}, 0);
             for (Result r : results) {
                 if (r.getSemester().equalsIgnoreCase(semester) && r.getYear() == year) {
