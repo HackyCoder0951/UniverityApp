@@ -55,14 +55,17 @@ public class DataExplorerFrame extends JFrame {
         addButton = new JButton("Add");
         updateButton = new JButton("Update");
         deleteButton = new JButton("Delete");
+        JButton refreshButton = new JButton("Refresh");
         crudPanel.add(addButton);
         crudPanel.add(updateButton);
         crudPanel.add(deleteButton);
+        crudPanel.add(refreshButton);
         mainContentPanel.add(crudPanel, BorderLayout.NORTH);
 
         addButton.addActionListener(e -> openDynamicDialog(null));
         updateButton.addActionListener(e -> openDynamicDialog(getSelectedRowData()));
         deleteButton.addActionListener(e -> deleteSelectedRecord());
+        refreshButton.addActionListener(e -> displayTableData(currentTable));
 
         add(mainContentPanel, BorderLayout.CENTER);
         

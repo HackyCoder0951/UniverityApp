@@ -128,9 +128,11 @@ public class MainFrame extends JFrame {
         userAddButton = new JButton("Add");
         userUpdateButton = new JButton("Update");
         userDeleteButton = new JButton("Delete");
+        JButton userRefreshButton = new JButton("Refresh");
         bottomButtonPanel.add(userAddButton);
         bottomButtonPanel.add(userUpdateButton);
         bottomButtonPanel.add(userDeleteButton);
+        bottomButtonPanel.add(userRefreshButton);
         
         bottomButtonPanel.add(new JSeparator(SwingConstants.VERTICAL));
 
@@ -143,6 +145,7 @@ public class MainFrame extends JFrame {
         userAddButton.addActionListener(e -> openDynamicDialog(null));
         userUpdateButton.addActionListener(e -> openDynamicDialog(getSelectedRowData()));
         userDeleteButton.addActionListener(e -> deleteSelectedRecord());
+        userRefreshButton.addActionListener(e -> displayUserData(currentTable));
 
         changePasswordButton.addActionListener(e -> {
             int response = JOptionPane.showConfirmDialog(this, "This will send a password change request to the administrator. Continue?", "Request Password Change", JOptionPane.YES_NO_OPTION);
