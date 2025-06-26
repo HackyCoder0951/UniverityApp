@@ -4,12 +4,18 @@ import com.university.app.model.Marks;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.university.app.db.DatabaseConnector;
 
 public class MarksDAO {
     private Connection conn;
 
     public MarksDAO() {
-        this.conn = DatabaseConnector.getConnection();
+        try {
+            this.conn = DatabaseConnector.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to connect to database", e);
+        }
     }
 
     public void addMark(Marks mark) throws SQLException {

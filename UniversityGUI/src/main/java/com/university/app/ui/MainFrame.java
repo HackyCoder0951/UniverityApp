@@ -46,7 +46,7 @@ public class MainFrame extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("User Management", new UserManagementPanel());
         tabbedPane.addTab("Password Requests", new PasswordRequestPanel());
-        tabbedPane.addTab("Data Explorer", new DataExplorerPanel());
+        // tabbedPane.addTab("Data Explorer", new DataExplorerPanel()); // DataExplorerPanel does not exist
 
         // Load background image
         java.net.URL imgUrl = getClass().getClassLoader().getResource("images/ysFxGz.jpg");

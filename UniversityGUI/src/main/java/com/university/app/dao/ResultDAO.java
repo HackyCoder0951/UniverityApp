@@ -4,12 +4,18 @@ import com.university.app.model.Result;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.university.app.db.DatabaseConnector;
 
 public class ResultDAO {
     private Connection conn;
 
     public ResultDAO() {
-        this.conn = DatabaseConnector.getConnection();
+        try {
+            this.conn = DatabaseConnector.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to connect to database", e);
+        }
     }
 
     public void addResult(Result result) throws SQLException {
