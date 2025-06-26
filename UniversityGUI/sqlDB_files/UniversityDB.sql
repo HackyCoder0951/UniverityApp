@@ -771,3 +771,65 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- =====================
+-- MARKS TABLE
+-- =====================
+CREATE TABLE IF NOT EXISTS marks (
+    mark_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id VARCHAR(20) NOT NULL,
+    course_id VARCHAR(20) NOT NULL,
+    section_id VARCHAR(20) NOT NULL,
+    instructor_id VARCHAR(20) NOT NULL,
+    semester VARCHAR(10) NOT NULL,
+    year INT NOT NULL,
+    marks DECIMAL(5,2) NOT NULL,
+    letter_grade VARCHAR(2) NOT NULL,
+    gpa DECIMAL(3,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_marks_student FOREIGN KEY (student_id) REFERENCES student(id),
+    CONSTRAINT fk_marks_course FOREIGN KEY (course_id) REFERENCES course(course_id),
+    CONSTRAINT fk_marks_section FOREIGN KEY (section_id) REFERENCES section(section_id),
+    CONSTRAINT fk_marks_instructor FOREIGN KEY (instructor_id) REFERENCES instructor(id),
+    INDEX idx_marks_student (student_id),
+    INDEX idx_marks_course (course_id),
+    INDEX idx_marks_section (section_id),
+    INDEX idx_marks_semester (semester, year)
+);
+
+-- Dummy data for marks table
+INSERT INTO marks (student_id, course_id, section_id, instructor_id, semester, year, marks, letter_grade, gpa)
+VALUES
+('S001', 'CSE101', 'SEC1', 'I001', 'Fall', 2023, 88.5, 'A', 4.00),
+('S002', 'CSE101', 'SEC1', 'I001', 'Fall', 2023, 76.0, 'B+', 3.30),
+('S001', 'MTH101', 'SEC2', 'I002', 'Fall', 2023, 92.0, 'A+', 4.00),
+('S003', 'PHY101', 'SEC1', 'I003', 'Spring', 2023, 65.0, 'C', 2.00);
+
+-- =====================
+-- RESULT TABLE
+-- =====================
+CREATE TABLE IF NOT EXISTS result (
+    result_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id VARCHAR(20) NOT NULL,
+    semester VARCHAR(10) NOT NULL,
+    year INT NOT NULL,
+    sgpa DECIMAL(3,2),
+    cgpa DECIMAL(3,2),
+    total_credits INT,
+    result_type ENUM('semester', 'annual', 'final') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_result_student FOREIGN KEY (student_id) REFERENCES student(id),
+    UNIQUE KEY uniq_result (student_id, semester, year, result_type),
+    INDEX idx_result_student (student_id),
+    INDEX idx_result_semester (semester, year)
+);
+
+-- Dummy data for result table
+INSERT INTO result (student_id, semester, year, sgpa, cgpa, total_credits, result_type)
+VALUES
+('S001', 'Fall', 2023, 3.90, 3.80, 24, 'semester'),
+('S002', 'Fall', 2023, 3.10, 3.10, 18, 'semester'),
+('S001', 'Annual', 2023, 3.85, 3.85, 48, 'annual'),
+('S003', 'Spring', 2023, 2.00, 2.00, 12, 'semester');
