@@ -6,14 +6,15 @@ import com.university.app.model.Result;
 import com.university.app.model.Student;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+// import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.SQLException;
-import java.util.List;
+//import java.sql.SQLException;
+import java.time.Year;
+//import java.util.List;
 
 public class ResultViewPanel extends JPanel {
     private JComboBox<String> studentCombo, semesterCombo, resultTypeCombo;
-    private JTextField yearField;
+    private JComboBox<Integer> yearCombo;
     private JButton searchButton;
     private JTable resultTable;
     private ResultDAO resultDAO;
@@ -40,8 +41,8 @@ public class ResultViewPanel extends JPanel {
         semesterCombo = new JComboBox<>(new String[]{"Spring", "Summer", "Fall", "Winter", "Annual"});
         filterPanel.add(semesterCombo);
         filterPanel.add(new JLabel("Year:"));
-        yearField = new JTextField(6);
-        filterPanel.add(yearField);
+        yearCombo = new JComboBox<>();
+        filterPanel.add(yearCombo);
         filterPanel.add(new JLabel("Type:"));
         resultTypeCombo = new JComboBox<>(new String[]{"semester", "annual", "final"});
         filterPanel.add(resultTypeCombo);
@@ -53,6 +54,8 @@ public class ResultViewPanel extends JPanel {
         add(new JScrollPane(resultTable), BorderLayout.CENTER);
 
         searchButton.addActionListener(e -> loadResults());
+        studentCombo.addActionListener(e -> updateYearCombo());
+        updateYearCombo();
     }
 
     private void loadResults() {
@@ -61,7 +64,7 @@ public class ResultViewPanel extends JPanel {
             String studentId = displayToIdMap.get(display);
             String semester = (String) semesterCombo.getSelectedItem();
             String resultType = (String) resultTypeCombo.getSelectedItem();
-            int year = Integer.parseInt(yearField.getText());
+            int year = (Integer) yearCombo.getSelectedItem();
             java.util.List<Result> results = new ResultDAO().getResultsByType(studentId, resultType);
             javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(
                 new String[]{"Semester", "Year", "SGPA", "CGPA", "Total Credits", "Type"}, 0);
@@ -76,5 +79,14 @@ public class ResultViewPanel extends JPanel {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error loading results: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void updateYearCombo() {
+        String display = (String) studentCombo.getSelectedItem();
+        String studentId = displayToIdMap.get(display);
+        java.util.List<Integer> years = new com.university.app.dao.ResultDAO().getAvailableYears(studentId);
+        yearCombo.removeAllItems();
+        for (Integer y : years) yearCombo.addItem(y);
+        if (yearCombo.getItemCount() > 0) yearCombo.setSelectedIndex(0);
     }
 } 

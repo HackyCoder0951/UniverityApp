@@ -94,15 +94,34 @@ public class ResultDAO {
         return resultList;
     }
 
+    public List<Integer> getAvailableYears(String studentId) {
+        List<Integer> years = new ArrayList<>();
+        String sql = "SELECT DISTINCT year FROM result WHERE student_id = ? ORDER BY year DESC";
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, studentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    years.add(rs.getInt("year"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return years;
+    }
+
     private Result extractResult(ResultSet rs) throws SQLException {
         Result result = new Result();
         result.setResultId(rs.getInt("result_id"));
         result.setStudentId(rs.getString("student_id"));
         result.setSemester(rs.getString("semester"));
         result.setYear(rs.getInt("year"));
-        result.setSgpa((Double)rs.getObject("sgpa"));
-        result.setCgpa((Double)rs.getObject("cgpa"));
-        result.setTotalCredits((Integer)rs.getObject("total_credits"));
+        java.math.BigDecimal sgpaBD = rs.getBigDecimal("sgpa");
+        result.setSgpa(sgpaBD != null ? sgpaBD.doubleValue() : null);
+        java.math.BigDecimal cgpaBD = rs.getBigDecimal("cgpa");
+        result.setCgpa(cgpaBD != null ? cgpaBD.doubleValue() : null);
+        result.setTotalCredits(rs.getInt("total_credits"));
         result.setResultType(rs.getString("result_type"));
         result.setCreatedAt(rs.getTimestamp("created_at"));
         result.setUpdatedAt(rs.getTimestamp("updated_at"));
