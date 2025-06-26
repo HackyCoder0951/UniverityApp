@@ -33,15 +33,29 @@ public class DynamicRecordDialog extends JDialog {
             Map<String, Integer> columnTypes = genericDAO.getColumnTypes(tableName);
             setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(5, 5, 5, 5);
+            gbc.insets = new Insets(8, 12, 8, 12);
             gbc.fill = GridBagConstraints.HORIZONTAL;
 
             int gridy = 0;
+            // Add help/info label at the top
+            gbc.gridx = 0;
+            gbc.gridy = gridy;
+            gbc.gridwidth = 2;
+            gbc.anchor = GridBagConstraints.CENTER;
+            JLabel infoLabel = new JLabel("This form is auto-generated. Fill in the fields and click Save. Fields with dropdowns are foreign keys.");
+            infoLabel.setFont(infoLabel.getFont().deriveFont(Font.ITALIC, 13f));
+            infoLabel.setForeground(new Color(60, 60, 60));
+            add(infoLabel, gbc);
+            gridy++;
+            gbc.gridwidth = 1;
+            gbc.anchor = GridBagConstraints.WEST;
+
             for (String columnName : columnNames) {
                 gbc.gridx = 0;
                 gbc.gridy = gridy;
                 gbc.weightx = 0;
-                add(new JLabel(columnName + ":"), gbc);
+                JLabel label = new JLabel(columnName + ":");
+                add(label, gbc);
 
                 gbc.gridx = 1;
                 gbc.gridy = gridy;
@@ -62,6 +76,7 @@ public class DynamicRecordDialog extends JDialog {
                     }
                     fkDisplayToIdMap.put(columnName, displayToId);
                     JComboBox<String> comboBox = new JComboBox<>(displayList.toArray(new String[0]));
+                    comboBox.setToolTipText("Select a value for '" + columnName + "' (foreign key)");
                     if (initialData != null) {
                         Object value = initialData.get(columnName);
                         if (value != null) {
@@ -110,6 +125,7 @@ public class DynamicRecordDialog extends JDialog {
                 } else {
                     JTextField textField = new JTextField();
                     textField.setPreferredSize(new Dimension(250, 25));
+                    textField.setToolTipText("Enter value for '" + columnName + "'");
                     if (initialData != null) {
                         Object value = initialData.get(columnName);
                         textField.setText(value != null ? value.toString() : "");
@@ -121,12 +137,25 @@ public class DynamicRecordDialog extends JDialog {
                 gridy++;
             }
 
+            // Status label for feedback
+            gbc.gridx = 0;
+            gbc.gridy = gridy + 1;
+            gbc.gridwidth = 2;
+            gbc.anchor = GridBagConstraints.CENTER;
+            JLabel statusLabel = new JLabel(" ");
+            statusLabel.setFont(statusLabel.getFont().deriveFont(Font.PLAIN, 12f));
+            statusLabel.setForeground(new Color(120, 40, 40));
+            add(statusLabel, gbc);
+            gbc.gridwidth = 1;
+            gbc.anchor = GridBagConstraints.EAST;
+
+            // Save button
             gbc.gridx = 1;
             gbc.gridy = gridy;
             gbc.anchor = GridBagConstraints.EAST;
             gbc.fill = GridBagConstraints.NONE;
             JButton saveButton = new JButton("Save");
-            saveButton.addActionListener(e -> saveRecord());
+            saveButton.addActionListener(e -> saveRecord(statusLabel));
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             buttonPanel.add(saveButton);
             gbc.gridwidth = 2;
@@ -134,7 +163,7 @@ public class DynamicRecordDialog extends JDialog {
             add(buttonPanel, gbc);
 
             pack();
-            setMinimumSize(new Dimension(Math.max(400, getWidth()), Math.max(200, getHeight())));
+            setMinimumSize(new Dimension(Math.max(420, getWidth()), Math.max(260, getHeight())));
             setLocationRelativeTo(owner);
 
         } catch (SQLException e) {
@@ -144,7 +173,7 @@ public class DynamicRecordDialog extends JDialog {
         }
     }
 
-    private void saveRecord() {
+    private void saveRecord(JLabel statusLabel) {
         Map<String, Object> values = new HashMap<>();
         try {
             Map<String, Integer> columnTypes = genericDAO.getColumnTypes(tableName);
@@ -155,34 +184,32 @@ public class DynamicRecordDialog extends JDialog {
                 int sqlType = columnTypes.getOrDefault(col, Types.VARCHAR);
                 if (comp instanceof JComboBox) {
                     String display = (String) ((JComboBox<?>) comp).getSelectedItem();
-                    // Map display string back to ID
                     value = fkDisplayToIdMap.containsKey(col) ? fkDisplayToIdMap.get(col).get(display) : display;
                 } else if (comp instanceof JTextField) {
                     String text = ((JTextField) comp).getText();
                     if (sqlType == Types.DATE && !text.isEmpty()) {
-                        // Validate date
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         sdf.setLenient(false);
                         try { sdf.parse(text); } catch (ParseException ex) {
-                            JOptionPane.showMessageDialog(this, "Please enter date in yyyy-MM-dd format for '" + col + "'", "Input Error", JOptionPane.ERROR_MESSAGE);
+                            statusLabel.setText("Please enter date in yyyy-MM-dd format for '" + col + "'");
                             return;
                         }
                         value = text;
                     } else if (sqlType == Types.TIME && !text.isEmpty()) {
                         if (!text.matches("\\d{2}:\\d{2}:\\d{2}")) {
-                            JOptionPane.showMessageDialog(this, "Please enter time in HH:mm:ss format for '" + col + "'", "Input Error", JOptionPane.ERROR_MESSAGE);
+                            statusLabel.setText("Please enter time in HH:mm:ss format for '" + col + "'");
                             return;
                         }
                         value = text;
                     } else if ((sqlType == Types.INTEGER || sqlType == Types.BIGINT || sqlType == Types.SMALLINT || sqlType == Types.TINYINT) && !text.isEmpty()) {
                         try { Integer.parseInt(text); } catch (NumberFormatException ex) {
-                            JOptionPane.showMessageDialog(this, "Please enter a valid whole number for '" + col + "'", "Input Error", JOptionPane.ERROR_MESSAGE);
+                            statusLabel.setText("Please enter a valid whole number for '" + col + "'");
                             return;
                         }
                         value = text;
                     } else if ((sqlType == Types.DECIMAL || sqlType == Types.NUMERIC || sqlType == Types.FLOAT || sqlType == Types.DOUBLE || sqlType == Types.REAL) && !text.isEmpty()) {
                         try { Double.parseDouble(text); } catch (NumberFormatException ex) {
-                            JOptionPane.showMessageDialog(this, "Please enter a valid number for '" + col + "'", "Input Error", JOptionPane.ERROR_MESSAGE);
+                            statusLabel.setText("Please enter a valid number for '" + col + "'");
                             return;
                         }
                         value = text;
@@ -197,25 +224,32 @@ public class DynamicRecordDialog extends JDialog {
 
             if (initialData == null) { // Add mode
                 genericDAO.insertRecord(tableName, values);
+                statusLabel.setForeground(new Color(30, 120, 30));
+                statusLabel.setText("Record added successfully!");
                 JOptionPane.showMessageDialog(this, "Record added successfully!");
+                dispose();
             } else { // Update mode
                 Map<String, Object> whereClauses = new HashMap<>();
                 List<String> primaryKeys = genericDAO.getPrimaryKeys(tableName);
                 for(String pk : primaryKeys){
                     whereClauses.put(pk, initialData.get(pk));
                 }
-                
                 if(whereClauses.isEmpty()){
+                     statusLabel.setForeground(new Color(120, 40, 40));
+                     statusLabel.setText("Cannot update record: No primary key defined for this table.");
                      JOptionPane.showMessageDialog(this, "Cannot update record: No primary key defined for this table.", "Error", JOptionPane.ERROR_MESSAGE);
                      return;
                 }
-                
                 genericDAO.updateRecord(tableName, values, whereClauses);
+                statusLabel.setForeground(new Color(30, 120, 30));
+                statusLabel.setText("Record updated successfully!");
                 JOptionPane.showMessageDialog(this, "Record updated successfully!");
+                dispose();
             }
-            dispose();
         } catch (SQLException e) {
             e.printStackTrace();
+            statusLabel.setForeground(new Color(120, 40, 40));
+            statusLabel.setText("Error saving record: " + e.getMessage());
             JOptionPane.showMessageDialog(this, "Error saving record: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
