@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jun 25, 2025 at 02:04 PM
+-- Generation Time: Jun 26, 2025 at 09:05 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 7.4.27
 
@@ -173,6 +173,7 @@ INSERT INTO `department` (`dept_name`, `building`, `budget`) VALUES
 --
 
 CREATE TABLE `grade_points` (
+  `id` int(11) NOT NULL,
   `grade` varchar(50) NOT NULL,
   `points` decimal(4,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -181,12 +182,12 @@ CREATE TABLE `grade_points` (
 -- Dumping data for table `grade_points`
 --
 
-INSERT INTO `grade_points` (`grade`, `points`) VALUES
-('A+', 4.00),
-('A-', 3.70),
-('B+', 3.30),
-('B-', 3.00),
-('C+', 2.75);
+INSERT INTO `grade_points` (`id`, `grade`, `points`) VALUES
+(1, 'A+', 4.00),
+(2, 'A-', 3.70),
+(3, 'B+', 3.30),
+(4, 'B-', 3.00),
+(5, 'C+', 2.75);
 
 -- --------------------------------------------------------
 
@@ -224,6 +225,47 @@ INSERT INTO `instructor` (`ID`, `name`, `dept_name`, `salary`) VALUES
 ('PH102', 'Prof. Kirti', 'Physics', 55000.00),
 ('SP707', 'Coach Sports', 'Sports', 30000.00),
 ('SP708', 'Medical Examinar', 'Sports', 35000.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `marks`
+--
+
+CREATE TABLE `marks` (
+  `mark_id` int(11) NOT NULL,
+  `student_id` varchar(10) NOT NULL,
+  `course_id` varchar(10) NOT NULL,
+  `sec_id` int(11) NOT NULL,
+  `semester` varchar(10) NOT NULL,
+  `year` int(11) NOT NULL,
+  `instructor_id` varchar(10) NOT NULL,
+  `marks` decimal(5,2) NOT NULL,
+  `letter_grade` int(11) NOT NULL,
+  `gpa` decimal(3,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `marks`
+--
+
+INSERT INTO `marks` (`mark_id`, `student_id`, `course_id`, `sec_id`, `semester`, `year`, `instructor_id`, `marks`, `letter_grade`, `gpa`, `created_at`, `updated_at`) VALUES
+(1, 'S101', 'CHEM101', 1, 'Fall', 2023, 'CH202', 95.00, 1, 4.00, '2025-06-26 18:49:24', '2025-06-26 19:00:48'),
+(2, 'S101', 'CHEM102', 1, 'Spring', 2024, 'CH202', 92.00, 1, 4.00, '2025-06-26 18:49:24', '2025-06-26 19:00:51'),
+(3, 'S101', 'CS101', 3, 'Fall', 2023, 'P123', 75.00, 5, 2.75, '2025-06-26 18:49:24', '2025-06-26 19:01:08'),
+(4, 'S101', 'ENG101', 6, 'Fall', 2023, 'EN505', 98.00, 1, 4.00, '2025-06-26 18:49:24', '2025-06-26 19:01:10'),
+(5, 'S101', 'MATH302', 1, 'Spring', 2024, 'M789', 85.00, 3, 3.30, '2025-06-26 18:49:24', '2025-06-26 19:01:34'),
+(6, 'S123', 'BIO101', 1, 'Fall', 2023, 'BI303', 97.00, 1, 4.00, '2025-06-26 18:49:24', '2025-06-26 19:01:14'),
+(7, 'S303', 'PHYS201', 1, 'Fall', 2023, 'PH101', 96.00, 1, 4.00, '2025-06-26 18:49:24', '2025-06-26 19:01:16'),
+(8, 'S404', 'HIST201', 7, 'Fall', 2023, 'HI404', 80.00, 4, 3.00, '2025-06-26 18:49:24', '2025-06-26 19:02:06'),
+(9, 'S404', 'PHYS202', 1, 'Spring', 2024, 'PH102', 99.00, 1, 4.00, '2025-06-26 18:49:24', '2025-06-26 19:01:18'),
+(10, 'S456', 'EE202', 2, 'Spring', 2024, 'E456', 88.00, 3, 3.30, '2025-06-26 18:49:24', '2025-06-26 19:01:43'),
+(11, 'S505', 'ENG101', 6, 'Fall', 2023, 'EN505', 97.00, 1, 4.00, '2025-06-26 18:49:24', '2025-06-26 19:01:22'),
+(12, 'S606', 'MGT301', 5, 'Fall', 2023, 'MG606', 87.00, 3, 3.30, '2025-06-26 18:49:24', '2025-06-26 19:01:45'),
+(13, 'S707', 'SPORT101', 4, 'Fall', 2023, 'SP707', 85.00, 3, 3.30, '2025-06-26 18:49:24', '2025-06-26 19:01:46'),
+(14, 'S789', 'MATH301', 1, 'Fall', 2023, 'M789', 91.00, 2, 3.70, '2025-06-26 18:49:24', '2025-06-26 19:01:55');
 
 -- --------------------------------------------------------
 
@@ -301,6 +343,42 @@ INSERT INTO `prereq` (`course_id`, `prereq_id`) VALUES
 ('PHYS202', 'PHYS102'),
 ('SPORT101', 'SPORT100'),
 ('SPORT102', 'SPORT101');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `result`
+--
+
+CREATE TABLE `result` (
+  `result_id` int(11) NOT NULL,
+  `student_id` varchar(20) NOT NULL,
+  `semester` varchar(10) NOT NULL,
+  `year` int(11) NOT NULL,
+  `sgpa` decimal(3,2) DEFAULT NULL,
+  `cgpa` decimal(3,2) DEFAULT NULL,
+  `total_credits` int(11) DEFAULT NULL,
+  `result_type` enum('semester','annual','final') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `result`
+--
+
+INSERT INTO `result` (`result_id`, `student_id`, `semester`, `year`, `sgpa`, `cgpa`, `total_credits`, `result_type`, `created_at`, `updated_at`) VALUES
+(1, 'S101', 'Fall', 2023, 3.61, 3.61, 15, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(2, 'S101', 'Spring', 2024, 3.65, 3.63, 12, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(3, 'S123', 'Fall', 2023, 4.00, 4.00, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(4, 'S303', 'Fall', 2023, 4.00, 4.00, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(5, 'S404', 'Fall', 2023, 3.00, 3.00, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(6, 'S404', 'Spring', 2024, 4.00, 3.50, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(7, 'S456', 'Spring', 2024, 3.30, 3.30, 4, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(8, 'S505', 'Fall', 2023, 4.00, 4.00, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(9, 'S606', 'Fall', 2023, 3.30, 3.30, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(10, 'S707', 'Fall', 2023, 3.30, 3.30, 2, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
+(11, 'S789', 'Fall', 2023, 3.70, 3.70, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06');
 
 -- --------------------------------------------------------
 
@@ -597,11 +675,29 @@ ALTER TABLE `department`
   ADD KEY `building` (`building`);
 
 --
+-- Indexes for table `grade_points`
+--
+ALTER TABLE `grade_points`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `instructor`
 --
 ALTER TABLE `instructor`
   ADD PRIMARY KEY (`ID`),
   ADD KEY `dept_name` (`dept_name`);
+
+--
+-- Indexes for table `marks`
+--
+ALTER TABLE `marks`
+  ADD PRIMARY KEY (`mark_id`,`student_id`,`course_id`,`sec_id`,`semester`,`year`,`instructor_id`),
+  ADD KEY `idx_marks_student` (`student_id`),
+  ADD KEY `idx_marks_course` (`course_id`),
+  ADD KEY `idx_marks_section` (`course_id`,`sec_id`,`semester`,`year`),
+  ADD KEY `idx_marks_semester` (`semester`,`year`),
+  ADD KEY `fk_marks_instructor` (`instructor_id`),
+  ADD KEY `fk_marks_grades` (`letter_grade`);
 
 --
 -- Indexes for table `password_requests`
@@ -622,6 +718,15 @@ ALTER TABLE `permissions`
 ALTER TABLE `prereq`
   ADD PRIMARY KEY (`course_id`,`prereq_id`),
   ADD KEY `prereq_id` (`prereq_id`);
+
+--
+-- Indexes for table `result`
+--
+ALTER TABLE `result`
+  ADD PRIMARY KEY (`result_id`),
+  ADD UNIQUE KEY `uniq_result` (`student_id`,`semester`,`year`,`result_type`),
+  ADD KEY `idx_result_student` (`student_id`),
+  ADD KEY `idx_result_semester` (`semester`,`year`);
 
 --
 -- Indexes for table `section`
@@ -669,10 +774,28 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `grade_points`
+--
+ALTER TABLE `grade_points`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `marks`
+--
+ALTER TABLE `marks`
+  MODIFY `mark_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT for table `password_requests`
 --
 ALTER TABLE `password_requests`
   MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `result`
+--
+ALTER TABLE `result`
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 -- --------------------------------------------------------
 
@@ -692,143 +815,24 @@ DROP TABLE IF EXISTS `student_gpa_sem`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `student_gpa_sem`  AS SELECT `t`.`ID` AS `student_id`, `t`.`semester` AS `semester`, `t`.`year` AS `year`, round(coalesce(sum(`g`.`points` * `c`.`credits`) / nullif(sum(`c`.`credits`),0),0),2) AS `SGPA` FROM ((`takes` `t` join `grade_points` `g` on(`t`.`grade` = `g`.`grade`)) join `course` `c` on(`t`.`course_id` = `c`.`course_id`)) GROUP BY `t`.`ID`, `t`.`semester`, `t`.`year` ;
 
-
--- =====================
--- MARKS TABLE
--- =====================
-CREATE TABLE IF NOT EXISTS marks (
-    mark_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(20) NOT NULL,
-    course_id VARCHAR(20) NOT NULL,
-    section_id VARCHAR(20) NOT NULL,
-    instructor_id VARCHAR(20) NOT NULL,
-    semester VARCHAR(10) NOT NULL,
-    year INT NOT NULL,
-    marks DECIMAL(5,2) NOT NULL,
-    letter_grade VARCHAR(2) NOT NULL,
-    gpa DECIMAL(3,2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_marks_student FOREIGN KEY (student_id) REFERENCES student(id),
-    CONSTRAINT fk_marks_course FOREIGN KEY (course_id) REFERENCES course(course_id),
-    CONSTRAINT fk_marks_section FOREIGN KEY (section_id) REFERENCES section(section_id),
-    CONSTRAINT fk_marks_instructor FOREIGN KEY (instructor_id) REFERENCES instructor(id),
-    INDEX idx_marks_student (student_id),
-    INDEX idx_marks_course (course_id),
-    INDEX idx_marks_section (section_id),
-    INDEX idx_marks_semester (semester, year)
-);
-
--- Dummy data for marks table
-INSERT INTO marks (student_id, course_id, section_id, instructor_id, semester, year, marks, letter_grade, gpa)
-VALUES
-('S001', 'CSE101', 'SEC1', 'I001', 'Fall', 2023, 88.5, 'A', 4.00),
-('S002', 'CSE101', 'SEC1', 'I001', 'Fall', 2023, 76.0, 'B+', 3.30),
-('S001', 'MTH101', 'SEC2', 'I002', 'Fall', 2023, 92.0, 'A+', 4.00),
-('S003', 'PHY101', 'SEC1', 'I003', 'Spring', 2023, 65.0, 'C', 2.00);
-
--- =====================
--- RESULT TABLE
--- =====================
-CREATE TABLE IF NOT EXISTS result (
-    result_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(20) NOT NULL,
-    semester VARCHAR(10) NOT NULL,
-    year INT NOT NULL,
-    sgpa DECIMAL(3,2),
-    cgpa DECIMAL(3,2),
-    total_credits INT,
-    result_type ENUM('semester', 'annual', 'final') NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_result_student FOREIGN KEY (student_id) REFERENCES student(id),
-    UNIQUE KEY uniq_result (student_id, semester, year, result_type),
-    INDEX idx_result_student (student_id),
-    INDEX idx_result_semester (semester, year)
-);
-
--- Dummy data for result table
-INSERT INTO result (student_id, semester, year, sgpa, cgpa, total_credits, result_type)
-VALUES
-('S001', 'Fall', 2023, 3.90, 3.80, 24, 'semester'),
-('S002', 'Fall', 2023, 3.10, 3.10, 18, 'semester'),
-('S001', 'Annual', 2023, 3.85, 3.85, 48, 'annual'),
-('S003', 'Spring', 2023, 2.00, 2.00, 12, 'semester');
-
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `advisor`
+-- Constraints for table `marks`
 --
-ALTER TABLE `advisor`
-  ADD CONSTRAINT `advisor_ibfk_1` FOREIGN KEY (`sID`) REFERENCES `student` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `advisor_ibfk_2` FOREIGN KEY (`iID`) REFERENCES `instructor` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `marks`
+  ADD CONSTRAINT `fk_marks_grades` FOREIGN KEY (`letter_grade`) REFERENCES `grade_points` (`id`),
+  ADD CONSTRAINT `fk_marks_instructor` FOREIGN KEY (`instructor_id`) REFERENCES `instructor` (`ID`),
+  ADD CONSTRAINT `fk_marks_section` FOREIGN KEY (`course_id`,`sec_id`,`semester`,`year`) REFERENCES `section` (`course_id`, `sec_id`, `semester`, `year`),
+  ADD CONSTRAINT `fk_marks_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`ID`);
 
 --
--- Constraints for table `course`
+-- Constraints for table `result`
 --
-ALTER TABLE `course`
-  ADD CONSTRAINT `course_ibfk_1` FOREIGN KEY (`dept_name`) REFERENCES `department` (`dept_name`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `department`
---
-ALTER TABLE `department`
-  ADD CONSTRAINT `department_ibfk_1` FOREIGN KEY (`building`) REFERENCES `classroom` (`building`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `instructor`
---
-ALTER TABLE `instructor`
-  ADD CONSTRAINT `instructor_ibfk_1` FOREIGN KEY (`dept_name`) REFERENCES `department` (`dept_name`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `password_requests`
---
-ALTER TABLE `password_requests`
-  ADD CONSTRAINT `password_requests_ibfk_1` FOREIGN KEY (`username`) REFERENCES `users` (`username`) ON DELETE CASCADE;
-
---
--- Constraints for table `permissions`
---
-ALTER TABLE `permissions`
-  ADD CONSTRAINT `permissions_ibfk_1` FOREIGN KEY (`username`) REFERENCES `users` (`username`) ON DELETE CASCADE;
-
---
--- Constraints for table `prereq`
---
-ALTER TABLE `prereq`
-  ADD CONSTRAINT `prereq_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `section`
---
-ALTER TABLE `section`
-  ADD CONSTRAINT `section_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `section_ibfk_2` FOREIGN KEY (`building`,`room_number`) REFERENCES `classroom` (`building`, `room_number`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `section_ibfk_3` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slot` (`time_slot_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `student`
---
-ALTER TABLE `student`
-  ADD CONSTRAINT `student_ibfk_1` FOREIGN KEY (`dept_name`) REFERENCES `department` (`dept_name`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `takes`
---
-ALTER TABLE `takes`
-  ADD CONSTRAINT `takes_ibfk_1` FOREIGN KEY (`ID`) REFERENCES `student` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `takes_ibfk_2` FOREIGN KEY (`course_id`,`sec_id`,`semester`,`year`) REFERENCES `section` (`course_id`, `sec_id`, `semester`, `year`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `teaches`
---
-ALTER TABLE `teaches`
-  ADD CONSTRAINT `teaches_ibfk_1` FOREIGN KEY (`ID`) REFERENCES `instructor` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `teaches_ibfk_2` FOREIGN KEY (`course_id`,`sec_id`,`semester`,`year`) REFERENCES `section` (`course_id`, `sec_id`, `semester`, `year`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `result`
+  ADD CONSTRAINT `fk_result_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`ID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
