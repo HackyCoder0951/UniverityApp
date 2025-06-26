@@ -51,10 +51,10 @@ public class MainFrame extends JFrame {
 
         // Load background image
         java.net.URL imgUrl = getClass().getClassLoader().getResource("images/ysFxGz.jpg");
-        System.out.println("Image URL: " + imgUrl);
+        /*System.out.println("Image URL: " + imgUrl);
         if (imgUrl == null) {
             JOptionPane.showMessageDialog(this, "Background image not found at images/ysFxGz.jpg!", "Image Error", JOptionPane.ERROR_MESSAGE);
-        }
+        }*/
         ImageIcon bgIcon = new ImageIcon(imgUrl);
         BackgroundPanel backgroundPanel = new BackgroundPanel(bgIcon.getImage());
 

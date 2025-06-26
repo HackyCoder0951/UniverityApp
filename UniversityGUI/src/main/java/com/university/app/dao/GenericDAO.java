@@ -4,7 +4,7 @@ import com.university.app.db.DatabaseConnector;
 
 import java.sql.*;
 import java.util.ArrayList;
-//import java.util.HashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -107,5 +107,79 @@ public class GenericDAO {
             }
             pstmt.executeUpdate();
         }
+    }
+
+    // Returns a map: column name -> referenced table/column (as "table.column")
+    public Map<String, String> getForeignKeys(String tableName) throws SQLException {
+        Map<String, String> foreignKeys = new HashMap<>();
+        try (Connection conn = DatabaseConnector.getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            ResultSet rs = metaData.getImportedKeys(conn.getCatalog(), null, tableName);
+            while (rs.next()) {
+                String fkColumn = rs.getString("FKCOLUMN_NAME");
+                String pkTable = rs.getString("PKTABLE_NAME");
+                String pkColumn = rs.getString("PKCOLUMN_NAME");
+                foreignKeys.put(fkColumn, pkTable + "." + pkColumn);
+            }
+        }
+        return foreignKeys;
+    }
+
+    // Returns all values for a referenced column (for dropdowns)
+    public List<String> getReferencedColumnValues(String refTable, String refColumn) throws SQLException {
+        List<String> values = new ArrayList<>();
+        String sql = "SELECT DISTINCT " + refColumn + " FROM " + refTable;
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                values.add(rs.getString(1));
+            }
+        }
+        return values;
+    }
+
+    // Returns a map: column name -> SQL type (java.sql.Types int)
+    public Map<String, Integer> getColumnTypes(String tableName) throws SQLException {
+        Map<String, Integer> columnTypes = new HashMap<>();
+        try (Connection conn = DatabaseConnector.getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            ResultSet rs = metaData.getColumns(conn.getCatalog(), null, tableName, null);
+            while (rs.next()) {
+                String colName = rs.getString("COLUMN_NAME");
+                int dataType = rs.getInt("DATA_TYPE");
+                columnTypes.put(colName, dataType);
+            }
+        }
+        return columnTypes;
+    }
+
+    // Returns a list of (ID, label) pairs for a referenced table/column
+    public List<String[]> getReferenceIdLabelPairs(String refTable, String refColumn) throws SQLException {
+        List<String[]> pairs = new ArrayList<>();
+        // Heuristic: look for a label column
+        String labelCol = null;
+        try (Connection conn = DatabaseConnector.getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            ResultSet rs = metaData.getColumns(conn.getCatalog(), null, refTable, null);
+            while (rs.next()) {
+                String col = rs.getString("COLUMN_NAME").toLowerCase();
+                if (!col.equals(refColumn.toLowerCase()) && (col.contains("name") || col.contains("title") || col.contains("desc"))) {
+                    labelCol = rs.getString("COLUMN_NAME");
+                    break;
+                }
+            }
+        }
+        String sql = "SELECT DISTINCT " + refColumn + (labelCol != null ? ", " + labelCol : "") + " FROM " + refTable;
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                String id = rs.getString(1);
+                String label = (labelCol != null) ? rs.getString(2) : id;
+                pairs.add(new String[]{id, label});
+            }
+        }
+        return pairs;
     }
 } 
