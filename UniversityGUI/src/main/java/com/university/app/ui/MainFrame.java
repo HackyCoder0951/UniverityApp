@@ -46,7 +46,7 @@ public class MainFrame extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("User Management", new UserManagementPanel());
         tabbedPane.addTab("Password Requests", new PasswordRequestPanel());
-        // tabbedPane.addTab("Data Explorer", new DataExplorerPanel()); // DataExplorerPanel does not exist
+        tabbedPane.addTab("Data Explorer", new DataExplorerPanel());
 
         // Load background image
         java.net.URL imgUrl = getClass().getClassLoader().getResource("images/ysFxGz.jpg");
@@ -54,6 +54,21 @@ public class MainFrame extends JFrame {
         BackgroundPanel backgroundPanel = new BackgroundPanel(bgIcon.getImage());
         backgroundPanel.setLayout(new BorderLayout());
         backgroundPanel.add(tabbedPane, BorderLayout.CENTER);
+
+        // Bottom button panel
+        JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JButton dataExplorerButton = new JButton("Data Explorer (Window)");
+        JButton changePasswordButton = new JButton("Change Password");
+        JButton logoutButton = new JButton("Logout");
+        bottomButtonPanel.add(dataExplorerButton);
+        bottomButtonPanel.add(changePasswordButton);
+        bottomButtonPanel.add(logoutButton);
+        backgroundPanel.add(bottomButtonPanel, BorderLayout.SOUTH);
+
+        dataExplorerButton.addActionListener(e -> new DataExplorerFrame().setVisible(true));
+        changePasswordButton.addActionListener(e -> new ChangePasswordDialog(this).setVisible(true));
+        logoutButton.addActionListener(e -> App.showLogin());
+
         setContentPane(backgroundPanel);
     }
 

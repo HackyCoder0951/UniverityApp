@@ -20,6 +20,7 @@
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Prereq.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/TimeSlot.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Marks.java
+/home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/DataExplorerPanel.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/DynamicRecordDialog.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Classroom.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/PrereqDAO.java
