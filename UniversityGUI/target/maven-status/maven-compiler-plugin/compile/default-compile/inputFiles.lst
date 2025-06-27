@@ -31,6 +31,7 @@
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/PasswordRequest.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/MainFrame.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/RoleManagementPanel.java
+/home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Role.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/AddCourseDialog.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/PasswordRequestPanel.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/DatabaseDAO.java
@@ -48,6 +49,7 @@
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/ForcePasswordResetDialog.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Section.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/ClassroomDAO.java
+/home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/RoleDAO.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Student.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/LoginDialog.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/ResultDAO.java
