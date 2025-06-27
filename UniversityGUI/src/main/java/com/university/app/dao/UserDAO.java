@@ -13,7 +13,7 @@ import java.util.List;
 public class UserDAO {
 
     public User getUserByUsername(String username) {
-        String sql = "SELECT u.uid, u.username, u.password, r.name AS role_name, u.requires_password_reset " +
+        String sql = "SELECT u.uid, u.username, u.password, r.name AS role_name, u.requires_password_reset, u.student_id " +
                      "FROM users u JOIN roles r ON u.role = r.id WHERE u.username = ?";
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -27,7 +27,8 @@ public class UserDAO {
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("role_name"),
-                        rs.getBoolean("requires_password_reset")
+                        rs.getBoolean("requires_password_reset"),
+                        rs.getString("student_id")
                 );
             }
         } catch (SQLException e) {
@@ -38,7 +39,7 @@ public class UserDAO {
 
     public List<User> getAllUsers(String currentUser) {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT u.uid, u.username, u.password, r.name AS role_name, u.requires_password_reset " +
+        String sql = "SELECT u.uid, u.username, u.password, r.name AS role_name, u.requires_password_reset, u.student_id " +
                      "FROM users u JOIN roles r ON u.role = r.id WHERE u.username != ?";
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -52,7 +53,8 @@ public class UserDAO {
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("role_name"),
-                        rs.getBoolean("requires_password_reset")
+                        rs.getBoolean("requires_password_reset"),
+                        rs.getString("student_id")
                 ));
             }
         } catch (SQLException e) {
@@ -62,13 +64,14 @@ public class UserDAO {
     }
 
     public void addUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (uid, username, password, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (uid, username, password, role, student_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getUid());
             pstmt.setString(2, user.getUsername());
             pstmt.setString(3, user.getPassword());
             pstmt.setString(4, user.getRole());
+            pstmt.setString(5, user.getStudentId());
             pstmt.executeUpdate();
         }
     }
@@ -110,13 +113,14 @@ public class UserDAO {
     }
 
     public void updateUser(String originalUid, User user) throws SQLException {
-        String sql = "UPDATE users SET username = ?, password = ?, role = ? WHERE uid = ?";
+        String sql = "UPDATE users SET username = ?, password = ?, role = ?, student_id = ? WHERE uid = ?";
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getRole());
-            pstmt.setString(4, originalUid);
+            pstmt.setString(4, user.getStudentId());
+            pstmt.setString(5, originalUid);
             pstmt.executeUpdate();
         }
     }

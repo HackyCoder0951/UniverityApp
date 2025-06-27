@@ -4,6 +4,7 @@ import com.university.app.dao.UserDAO;
 import com.university.app.dao.LoginHistoryDAO;
 import com.university.app.model.User;
 import com.university.app.service.UserSession;
+import com.university.app.model.Role;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,10 +14,19 @@ public class LoginDialog extends JDialog {
     private JComboBox<User> userComboBox;
     private JPasswordField passwordField;
     private boolean authenticated = false;
+    private JComboBox<Role> roleComboBox;
+    private JTextField studentIdField;
 
     public LoginDialog(Frame owner) {
         super(owner, "Login", true);
         setLayout(new BorderLayout());
+
+        roleComboBox = new JComboBox<>();
+        for (Role role : new com.university.app.dao.RoleDAO().getAllRoles()) {
+            roleComboBox.addItem(role);
+        }
+        roleComboBox.setSelectedIndex(-1);
+        roleComboBox.addActionListener(e -> onRoleChanged());
 
         userComboBox = new JComboBox<>();
         // Populate userComboBox with all users (UID - Username)
@@ -28,9 +38,16 @@ public class LoginDialog extends JDialog {
         passwordField = new JPasswordField();
         passwordField.setEnabled(false);
         userComboBox.addActionListener(e -> passwordField.setEnabled(userComboBox.getSelectedIndex() != -1));
-        JPanel panel = new JPanel(new GridLayout(2, 2));
+        studentIdField = new JTextField();
+        studentIdField.setEnabled(false);
+
+        JPanel panel = new JPanel(new GridLayout(4, 2));
+        panel.add(new JLabel("Role:"));
+        panel.add(roleComboBox);
         panel.add(new JLabel("User (UID - Username):"));
         panel.add(userComboBox);
+        panel.add(new JLabel("Student ID:"));
+        panel.add(studentIdField);
         panel.add(new JLabel("Password:"));
         panel.add(passwordField);
         add(panel, BorderLayout.CENTER);
@@ -41,12 +58,33 @@ public class LoginDialog extends JDialog {
         
         pack();
         setLocationRelativeTo(owner);
+        onRoleChanged();
+    }
+
+    private void onRoleChanged() {
+        Role selectedRole = (Role) roleComboBox.getSelectedItem();
+        boolean isStudent = selectedRole != null && selectedRole.getName().equalsIgnoreCase("student");
+        userComboBox.setEnabled(!isStudent);
+        studentIdField.setEnabled(isStudent);
+        passwordField.setEnabled(false);
+        if (isStudent) {
+            userComboBox.setSelectedIndex(-1);
+        } else {
+            studentIdField.setText("");
+        }
     }
 
     private void handleAuthenticate() {
         if (authenticate()) {
             authenticated = true;
-            User user = (User) userComboBox.getSelectedItem();
+            Role selectedRole = (Role) roleComboBox.getSelectedItem();
+            User user = null;
+            if (selectedRole != null && selectedRole.getName().equalsIgnoreCase("student")) {
+                String studentId = studentIdField.getText();
+                user = new UserDAO().getUserByUsername(studentId);
+            } else {
+                user = (User) userComboBox.getSelectedItem();
+            }
             UserSession.getInstance().setCurrentUser(user);
             try {
                 new LoginHistoryDAO().logLogin(user.getUid(), user.getUsername());
@@ -56,7 +94,7 @@ public class LoginDialog extends JDialog {
             dispose();
 
             // Force password change if required
-            if (user.isRequiresPasswordReset()) {
+            if (user != null && user.isRequiresPasswordReset()) {
                 ForcePasswordResetDialog resetDialog = new ForcePasswordResetDialog(null);
                 resetDialog.setVisible(true);
             }
@@ -66,11 +104,20 @@ public class LoginDialog extends JDialog {
     }
 
     public boolean authenticate() {
-        User selectedUser = (User) userComboBox.getSelectedItem();
-        if (selectedUser == null) return false;
-        String password = new String(passwordField.getPassword());
-        User user = new UserDAO().getUserByUsername(selectedUser.getUsername());
-        return user != null && user.getPassword().equals(password);
+        Role selectedRole = (Role) roleComboBox.getSelectedItem();
+        if (selectedRole != null && selectedRole.getName().equalsIgnoreCase("student")) {
+            String studentId = studentIdField.getText();
+            if (studentId == null || studentId.isEmpty()) return false;
+            String password = new String(passwordField.getPassword());
+            User user = new UserDAO().getUserByUsername(studentId);
+            return user != null && user.getPassword().equals(password) && user.getRole().equalsIgnoreCase("student");
+        } else {
+            User selectedUser = (User) userComboBox.getSelectedItem();
+            if (selectedUser == null) return false;
+            String password = new String(passwordField.getPassword());
+            User user = new UserDAO().getUserByUsername(selectedUser.getUsername());
+            return user != null && user.getPassword().equals(password);
+        }
     }
 
     public boolean isAuthenticated() {

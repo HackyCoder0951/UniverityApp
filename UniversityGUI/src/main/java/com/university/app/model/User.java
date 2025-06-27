@@ -6,13 +6,15 @@ public class User {
     private String password;
     private String role;
     private boolean requiresPasswordReset;
+    private String studentId;
 
-    public User(String uid, String username, String password, String role, boolean requiresPasswordReset) {
+    public User(String uid, String username, String password, String role, boolean requiresPasswordReset, String studentId) {
         this.uid = uid;
         this.username = username;
         this.password = password;
         this.role = role;
         this.requiresPasswordReset = requiresPasswordReset;
+        this.studentId = studentId;
     }
 
     // Getters
@@ -36,8 +38,12 @@ public class User {
         return uid;
     }
 
+    public String getStudentId() {
+        return studentId;
+    }
+
     @Override
     public String toString() {
-        return uid + " - " + username;
+        return uid + " - " + username + (studentId != null ? " (Student ID: " + studentId + ")" : "");
     }
 } 

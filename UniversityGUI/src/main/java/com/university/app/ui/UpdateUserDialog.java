@@ -76,6 +76,7 @@ public class UpdateUserDialog extends JDialog {
         roleComboBox.setToolTipText("Select the user's role");
         gbc.gridx = 1; gbc.gridy = 2;
         add(roleComboBox, gbc);
+        roleComboBox.addActionListener(e -> onRoleChanged());
 
         JLabel uidLabel = new JLabel("UID:");
         uidLabel.setToolTipText("User ID (not editable)");
@@ -97,6 +98,7 @@ public class UpdateUserDialog extends JDialog {
         gbc.gridx = 1; gbc.gridy = 5;
         add(departmentComboBox, gbc);
         departmentComboBox.setEnabled(false);
+        departmentComboBox.addActionListener(e -> onDepartmentChanged());
 
         // Course dropdown
         JLabel courseLabel = new JLabel("Course:");
@@ -106,6 +108,7 @@ public class UpdateUserDialog extends JDialog {
         gbc.gridx = 1; gbc.gridy = 6;
         add(courseComboBox, gbc);
         courseComboBox.setEnabled(false);
+        courseComboBox.addActionListener(e -> onCourseChanged());
 
         // Section dropdown
         JLabel sectionLabel = new JLabel("Section:");
@@ -115,6 +118,7 @@ public class UpdateUserDialog extends JDialog {
         gbc.gridx = 1; gbc.gridy = 7;
         add(sectionComboBox, gbc);
         sectionComboBox.setEnabled(false);
+        sectionComboBox.addActionListener(e -> onSectionChanged());
 
         // Semester dropdown
         JLabel semesterLabel = new JLabel("Semester:");
@@ -124,6 +128,7 @@ public class UpdateUserDialog extends JDialog {
         gbc.gridx = 1; gbc.gridy = 8;
         add(semesterComboBox, gbc);
         semesterComboBox.setEnabled(false);
+        semesterComboBox.addActionListener(e -> onSemesterChanged());
 
         // Year dropdown
         JLabel yearLabel = new JLabel("Year:");
@@ -133,6 +138,7 @@ public class UpdateUserDialog extends JDialog {
         gbc.gridx = 1; gbc.gridy = 9;
         add(yearComboBox, gbc);
         yearComboBox.setEnabled(false);
+        yearComboBox.addActionListener(e -> onYearChanged());
 
         // Student dropdown
         JLabel studentLabel = new JLabel("Student:");
@@ -178,6 +184,121 @@ public class UpdateUserDialog extends JDialog {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error updating user: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
+        }
+    }
+
+    private void onRoleChanged() {
+        Role selectedRole = (Role) roleComboBox.getSelectedItem();
+        boolean isStudent = selectedRole != null && selectedRole.getName().equalsIgnoreCase("student");
+        departmentComboBox.setEnabled(isStudent);
+        courseComboBox.setEnabled(false);
+        sectionComboBox.setEnabled(false);
+        semesterComboBox.setEnabled(false);
+        yearComboBox.setEnabled(false);
+        studentComboBox.setEnabled(false);
+        if (isStudent) {
+            departmentComboBox.removeAllItems();
+            for (Department d : new DepartmentDAO().getAllDepartments()) {
+                departmentComboBox.addItem(d);
+            }
+        } else {
+            departmentComboBox.removeAllItems();
+            courseComboBox.removeAllItems();
+            sectionComboBox.removeAllItems();
+            semesterComboBox.removeAllItems();
+            yearComboBox.removeAllItems();
+            studentComboBox.removeAllItems();
+        }
+    }
+
+    private void onDepartmentChanged() {
+        Department selectedDept = (Department) departmentComboBox.getSelectedItem();
+        courseComboBox.setEnabled(selectedDept != null);
+        courseComboBox.removeAllItems();
+        sectionComboBox.setEnabled(false);
+        sectionComboBox.removeAllItems();
+        semesterComboBox.setEnabled(false);
+        semesterComboBox.removeAllItems();
+        yearComboBox.setEnabled(false);
+        yearComboBox.removeAllItems();
+        studentComboBox.setEnabled(false);
+        studentComboBox.removeAllItems();
+        if (selectedDept != null) {
+            for (Course c : new CourseDAO().getAllCourses()) {
+                if (c.getDeptName().equals(selectedDept.getDeptName())) {
+                    courseComboBox.addItem(c);
+                }
+            }
+        }
+    }
+
+    private void onCourseChanged() {
+        Course selectedCourse = (Course) courseComboBox.getSelectedItem();
+        sectionComboBox.setEnabled(selectedCourse != null);
+        sectionComboBox.removeAllItems();
+        semesterComboBox.setEnabled(false);
+        semesterComboBox.removeAllItems();
+        yearComboBox.setEnabled(false);
+        yearComboBox.removeAllItems();
+        studentComboBox.setEnabled(false);
+        studentComboBox.removeAllItems();
+        if (selectedCourse != null) {
+            for (Section s : new SectionDAO().getAllSections()) {
+                if (s.getCourseId().equals(selectedCourse.getCourseId())) {
+                    sectionComboBox.addItem(s);
+                }
+            }
+        }
+    }
+
+    private void onSectionChanged() {
+        Section selectedSection = (Section) sectionComboBox.getSelectedItem();
+        semesterComboBox.setEnabled(selectedSection != null);
+        semesterComboBox.removeAllItems();
+        yearComboBox.setEnabled(false);
+        yearComboBox.removeAllItems();
+        studentComboBox.setEnabled(false);
+        studentComboBox.removeAllItems();
+        if (selectedSection != null) {
+            semesterComboBox.addItem(selectedSection.getSemester());
+            yearComboBox.setEnabled(true);
+            yearComboBox.removeAllItems();
+            yearComboBox.addItem(selectedSection.getYear());
+        }
+    }
+
+    private void onSemesterChanged() {
+        Section selectedSection = (Section) sectionComboBox.getSelectedItem();
+        String selectedSemester = (String) semesterComboBox.getSelectedItem();
+        yearComboBox.setEnabled(selectedSemester != null);
+        yearComboBox.removeAllItems();
+        studentComboBox.setEnabled(false);
+        studentComboBox.removeAllItems();
+        if (selectedSection != null && selectedSemester != null) {
+            yearComboBox.addItem(selectedSection.getYear());
+        }
+    }
+
+    private void onYearChanged() {
+        Section selectedSection = (Section) sectionComboBox.getSelectedItem();
+        String selectedSemester = (String) semesterComboBox.getSelectedItem();
+        Integer selectedYear = (Integer) yearComboBox.getSelectedItem();
+        studentComboBox.setEnabled(selectedSection != null && selectedSemester != null && selectedYear != null);
+        studentComboBox.removeAllItems();
+        if (selectedSection != null && selectedSemester != null && selectedYear != null) {
+            for (com.university.app.model.Takes t : new com.university.app.dao.TakesDAO().getAllTakes()) {
+                if (t.getCourseId().equals(selectedSection.getCourseId()) &&
+                    t.getSecId() == selectedSection.getSecId() &&
+                    t.getSemester().equals(selectedSemester) &&
+                    t.getYear() == selectedYear) {
+                    Student s = new StudentDAO().getAllStudents().stream()
+                        .filter(st -> st.getId().equals(t.getStudentId()))
+                        .findFirst().orElse(null);
+                    if (s != null) {
+                        studentComboBox.addItem(s);
+                    }
+                }
+            }
         }
     }
 } 
