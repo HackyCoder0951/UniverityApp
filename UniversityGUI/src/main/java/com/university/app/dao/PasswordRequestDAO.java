@@ -48,4 +48,24 @@ public class PasswordRequestDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public List<PasswordRequest> getAllRequests() {
+        List<PasswordRequest> requests = new ArrayList<>();
+        String sql = "SELECT * FROM password_requests ORDER BY request_date DESC";
+        try (Connection conn = DatabaseConnector.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                requests.add(new PasswordRequest(
+                        rs.getInt("request_id"),
+                        rs.getString("username"),
+                        rs.getTimestamp("request_date"),
+                        rs.getString("status")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return requests;
+    }
 } 

@@ -37,12 +37,15 @@ public class PasswordRequestPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton approveButton = new JButton("Approve Request");
         JButton denyButton = new JButton("Deny Request");
+        JButton historyButton = new JButton("View History");
         
         approveButton.addActionListener(e -> handleRequest("approved"));
         denyButton.addActionListener(e -> handleRequest("denied"));
+        historyButton.addActionListener(e -> showHistoryDialog());
         
         buttonPanel.add(approveButton);
         buttonPanel.add(denyButton);
+        buttonPanel.add(historyButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
         loadPendingRequests();
@@ -105,5 +108,22 @@ public class PasswordRequestPanel extends JPanel {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void showHistoryDialog() {
+        List<PasswordRequest> allRequests = passwordRequestDAO.getAllRequests();
+        String[] columns = {"Request ID", "Username", "Request Date", "Status"};
+        DefaultTableModel historyModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        for (PasswordRequest req : allRequests) {
+            historyModel.addRow(new Object[]{
+                req.getRequestId(), req.getUsername(), req.getRequestDate(), req.getStatus()
+            });
+        }
+        JTable historyTable = new JTable(historyModel);
+        JScrollPane scrollPane = new JScrollPane(historyTable);
+        JOptionPane.showMessageDialog(this, scrollPane, "Password Request History", JOptionPane.INFORMATION_MESSAGE);
     }
 } 
