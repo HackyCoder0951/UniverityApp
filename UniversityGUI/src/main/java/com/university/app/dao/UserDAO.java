@@ -67,7 +67,9 @@ public class UserDAO {
         String sql = "INSERT INTO users (uid, username, password, role, student_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, user.getUid());
+            // For student users, use studentId as UID. For others, set to null (or handle as needed)
+            String uidToUse = user.getStudentId() != null ? user.getStudentId() : null;
+            pstmt.setString(1, uidToUse);
             pstmt.setString(2, user.getUsername());
             pstmt.setString(3, user.getPassword());
             pstmt.setString(4, user.getRole());

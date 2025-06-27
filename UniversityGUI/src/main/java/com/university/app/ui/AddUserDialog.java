@@ -156,25 +156,26 @@ public class AddUserDialog extends JDialog {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
         Role selectedRole = (Role) roleComboBox.getSelectedItem();
+        String studentId = null;
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (selectedRole != null && selectedRole.getName().equalsIgnoreCase("student")) {
+            String selectedStudent = (String) studentComboBox.getSelectedItem();
+            if (selectedStudent == null || selectedStudent.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please select a student.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            studentId = selectedStudent.split(" - ")[0];
+            usernameField.setText(studentId); // auto-fill username
+        }
+
+        if (usernameField.getText().isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Username and password cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
             UserDAO userDAO = new UserDAO();
-            String userId = username;
-            if (selectedRole != null && selectedRole.getName().equalsIgnoreCase("student")) {
-                String selectedStudent = (String) studentComboBox.getSelectedItem();
-                if (selectedStudent == null || selectedStudent.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Please select a student.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                userId = selectedStudent.split(" - ")[0];
-                username = userId; // Student login uses student ID
-            }
-            User user = new User(null, username, password, String.valueOf(selectedRole.getId()), false);
+            User user = new User(null, usernameField.getText(), password, String.valueOf(selectedRole.getId()), false, studentId);
             userDAO.addUser(user);
             JOptionPane.showMessageDialog(this, "User added successfully!");
             dispose();
@@ -193,11 +194,14 @@ public class AddUserDialog extends JDialog {
         semesterComboBox.setEnabled(false);
         yearComboBox.setEnabled(false);
         studentComboBox.setEnabled(false);
+        usernameField.setEditable(!isStudent);
+        usernameField.setVisible(true);
         if (isStudent) {
             departmentComboBox.removeAllItems();
             for (Department d : new DepartmentDAO().getAllDepartments()) {
                 departmentComboBox.addItem(d);
             }
+            usernameField.setText("");
         } else {
             departmentComboBox.removeAllItems();
             courseComboBox.removeAllItems();
@@ -205,6 +209,7 @@ public class AddUserDialog extends JDialog {
             semesterComboBox.removeAllItems();
             yearComboBox.removeAllItems();
             studentComboBox.removeAllItems();
+            usernameField.setText("");
         }
     }
 
@@ -325,7 +330,10 @@ public class AddUserDialog extends JDialog {
         if (selectedRole != null && selectedRole.getName().equalsIgnoreCase("student")) {
             String selectedStudent = (String) studentComboBox.getSelectedItem();
             if (selectedStudent != null && !selectedStudent.isEmpty()) {
-                saveUser();
+                String studentId = selectedStudent.split(" - ")[0];
+                usernameField.setText(studentId);
+            } else {
+                usernameField.setText("");
             }
         }
     }

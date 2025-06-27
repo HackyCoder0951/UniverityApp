@@ -42,13 +42,13 @@ public class LoginDialog extends JDialog {
         studentIdField.setEnabled(false);
 
         JPanel panel = new JPanel(new GridLayout(4, 2));
-        panel.add(new JLabel("Role:"));
+        panel.add(new JLabel(" Role:"));
         panel.add(roleComboBox);
-        panel.add(new JLabel("User (UID - Username):"));
+        panel.add(new JLabel(" User (UID - Username):"));
         panel.add(userComboBox);
-        panel.add(new JLabel("Student ID:"));
+        panel.add(new JLabel(" Student ID:"));
         panel.add(studentIdField);
-        panel.add(new JLabel("Password:"));
+        panel.add(new JLabel(" Password:"));
         panel.add(passwordField);
         add(panel, BorderLayout.CENTER);
         

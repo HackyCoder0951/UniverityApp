@@ -31,6 +31,7 @@ public class UpdateUserDialog extends JDialog {
     private JComboBox<Integer> yearComboBox;
     private JComboBox<Student> studentComboBox;
     private JTextField studentIdField;
+    private JLabel studentIdLabel;
     private UserDAO userDAO;
     private User userToUpdate;
 
@@ -91,7 +92,7 @@ public class UpdateUserDialog extends JDialog {
         add(uidField, gbc);
 
         // Student ID (read-only, only for student users)
-        JLabel studentIdLabel = new JLabel("Student ID:");
+        studentIdLabel = new JLabel("Student ID:");
         studentIdLabel.setToolTipText("Student ID (not editable)");
         gbc.gridx = 0; gbc.gridy = 4;
         studentIdField = new JTextField(userToUpdate.getStudentId() != null ? userToUpdate.getStudentId() : "", 16);
@@ -207,6 +208,8 @@ public class UpdateUserDialog extends JDialog {
     private void onRoleChanged() {
         Role selectedRole = (Role) roleComboBox.getSelectedItem();
         boolean isStudent = selectedRole != null && selectedRole.getName().equalsIgnoreCase("student");
+        studentIdLabel.setVisible(isStudent);
+        studentIdField.setVisible(isStudent);
         departmentComboBox.setEnabled(isStudent);
         courseComboBox.setEnabled(false);
         sectionComboBox.setEnabled(false);

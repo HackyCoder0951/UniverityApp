@@ -60,7 +60,7 @@ public class ChangePasswordDialog extends JDialog {
             userDAO.updatePassword(currentUser.getUsername(), newPassword);
             
             // Update password in current session as well
-            currentUser = new User(currentUser.getUid(), currentUser.getUsername(), newPassword, currentUser.getRole(), false);
+            currentUser = new User(currentUser.getUid(), currentUser.getUsername(), newPassword, currentUser.getRole(), false, currentUser.getStudentId());
             UserSession.getInstance().setCurrentUser(currentUser);
 
             JOptionPane.showMessageDialog(this, "Password updated successfully!");
