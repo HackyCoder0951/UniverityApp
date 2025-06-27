@@ -13,7 +13,8 @@ import java.util.List;
 public class UserDAO {
 
     public User getUserByUsername(String username) {
-        String sql = "SELECT uid, username, password, role, requires_password_reset FROM users WHERE username = ?";
+        String sql = "SELECT u.uid, u.username, u.password, r.name AS role_name, u.requires_password_reset " +
+                     "FROM users u JOIN roles r ON u.role = r.id WHERE u.username = ?";
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
@@ -25,7 +26,7 @@ public class UserDAO {
                         rs.getString("uid"),
                         rs.getString("username"),
                         rs.getString("password"),
-                        rs.getString("role"),
+                        rs.getString("role_name"),
                         rs.getBoolean("requires_password_reset")
                 );
             }
@@ -37,7 +38,8 @@ public class UserDAO {
 
     public List<User> getAllUsers(String currentUser) {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT uid, username, password, role, requires_password_reset FROM users WHERE username != ?";
+        String sql = "SELECT u.uid, u.username, u.password, r.name AS role_name, u.requires_password_reset " +
+                     "FROM users u JOIN roles r ON u.role = r.id WHERE u.username != ?";
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
@@ -49,7 +51,7 @@ public class UserDAO {
                         rs.getString("uid"),
                         rs.getString("username"),
                         rs.getString("password"),
-                        rs.getString("role"),
+                        rs.getString("role_name"),
                         rs.getBoolean("requires_password_reset")
                 ));
             }

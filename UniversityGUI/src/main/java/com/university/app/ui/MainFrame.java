@@ -29,6 +29,8 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         User currentUser = UserSession.getInstance().getCurrentUser();
+        System.out.println("DEBUG: Current user: " + (currentUser != null ? currentUser.getUsername() : "null") +
+                           ", role: " + (currentUser != null ? currentUser.getRole() : "null"));
         if (currentUser != null && "admin".equals(currentUser.getRole())) {
             buildAdminUI();
         } else {
@@ -100,6 +102,10 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        boolean isEntry = currentUser != null && "entry".equals(currentUser.getRole());
+        boolean isReporting = currentUser != null && "reporting".equals(currentUser.getRole());
+
         // Create JTabbedPane for entry/reporting users
         JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -108,7 +114,7 @@ public class MainFrame extends JFrame {
         this.tableViewerDAO = new TableViewerDAO();
         DefaultListModel<String> listModel = new DefaultListModel<>();
         UserDAO userDAO = new UserDAO();
-        userDAO.getPermissionsForUser(UserSession.getInstance().getCurrentUser().getUsername()).forEach(listModel::addElement);
+        userDAO.getPermissionsForUser(currentUser.getUsername()).forEach(listModel::addElement);
         JList<String> tableList = new JList<>(listModel);
         tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane sidebarScrollPane = new JScrollPane(tableList);
@@ -127,15 +133,21 @@ public class MainFrame extends JFrame {
         userUpdateButton = new JButton("Update");
         userDeleteButton = new JButton("Delete");
         JButton userRefreshButton = new JButton("Refresh");
-        bottomButtonPanel.add(userAddButton);
-        bottomButtonPanel.add(userUpdateButton);
-        bottomButtonPanel.add(userDeleteButton);
+        if (isEntry) {
+            bottomButtonPanel.add(userAddButton);
+            bottomButtonPanel.add(userUpdateButton);
+            bottomButtonPanel.add(userDeleteButton);
+        }
         bottomButtonPanel.add(userRefreshButton);
         bottomButtonPanel.add(new JSeparator(SwingConstants.VERTICAL));
-        // JButton marksEntryButton = new JButton("Marks Entry");
-        // JButton resultsViewButton = new JButton("Results View");
-        // bottomButtonPanel.add(marksEntryButton);
-        // bottomButtonPanel.add(resultsViewButton);
+        if (isEntry) {
+            JButton marksEntryButton = new JButton("Marks Entry");
+            JButton resultsViewButton = new JButton("Results View");
+            bottomButtonPanel.add(marksEntryButton);
+            bottomButtonPanel.add(resultsViewButton);
+            marksEntryButton.addActionListener(e -> new MarksEntryDialog(this).setVisible(true));
+            resultsViewButton.addActionListener(e -> new ResultViewDialog(this).setVisible(true));
+        }
         JButton changePasswordButton = new JButton("Request Password Change");
         JButton logoutButton = new JButton("Logout");
         bottomButtonPanel.add(changePasswordButton);
@@ -145,8 +157,6 @@ public class MainFrame extends JFrame {
         userUpdateButton.addActionListener(e -> openDynamicDialog(getSelectedRowData()));
         userDeleteButton.addActionListener(e -> deleteSelectedRecord());
         userRefreshButton.addActionListener(e -> displayUserData(currentTable));
-        // marksEntryButton.addActionListener(e -> new MarksEntryDialog(this).setVisible(true));
-        // resultsViewButton.addActionListener(e -> new ResultViewDialog(this).setVisible(true));
         changePasswordButton.addActionListener(e -> {
             int response = JOptionPane.showConfirmDialog(this, "This will send a password change request to the administrator. Continue?", "Request Password Change", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
@@ -159,10 +169,10 @@ public class MainFrame extends JFrame {
             }
         });
         logoutButton.addActionListener(e -> {
-            User currentUser = UserSession.getInstance().getCurrentUser();
-            if (currentUser != null) {
+            User cu = UserSession.getInstance().getCurrentUser();
+            if (cu != null) {
                 try {
-                    new com.university.app.dao.LoginHistoryDAO().logLogout(currentUser.getUid());
+                    new com.university.app.dao.LoginHistoryDAO().logLogout(cu.getUid());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -170,9 +180,6 @@ public class MainFrame extends JFrame {
             App.showLogin();
         });
         tabbedPane.addTab("Data Entry", dataEntryPanel);
-        // Remove Marks Entry and Results View tabs for entry/reporting users
-        // tabbedPane.addTab("Marks Entry", new MarksEntryPanel());
-        // tabbedPane.addTab("Results View", new ResultViewPanel());
         add(tabbedPane, BorderLayout.CENTER);
     }
 
@@ -276,5 +283,16 @@ public class MainFrame extends JFrame {
         JTable table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
         JOptionPane.showMessageDialog(this, scrollPane, "Login History", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private String mapRole(Object dbRole) {
+        if (dbRole == null) return null;
+        String roleStr = dbRole.toString();
+        switch (roleStr) {
+            case "1": return "admin";
+            case "2": return "entry";
+            case "3": return "reporting";
+            default: return roleStr;
+        }
     }
 } 
