@@ -11,6 +11,7 @@ public class AddUserDialog extends JDialog {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JComboBox<String> roleComboBox;
+    private JTextField uidField;
 
     public AddUserDialog(Frame owner) {
         super(owner, "Add New User", true);
@@ -28,6 +29,10 @@ public class AddUserDialog extends JDialog {
         roleComboBox = new JComboBox<>(new String[]{"entry", "reporting"});
         add(roleComboBox);
 
+        add(new JLabel("UID:"));
+        uidField = new JTextField();
+        add(uidField);
+
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(e -> saveUser());
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -42,6 +47,7 @@ public class AddUserDialog extends JDialog {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
         String role = (String) roleComboBox.getSelectedItem();
+        String uid = uidField.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Username and password cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -50,7 +56,8 @@ public class AddUserDialog extends JDialog {
 
         try {
             UserDAO userDAO = new UserDAO();
-            userDAO.addUser(new User(username, password, role, false));
+            User user = new User(uid, username, password, role, false);
+            userDAO.addUser(user);
             JOptionPane.showMessageDialog(this, "User added successfully!");
             dispose();
         } catch (SQLException ex) {

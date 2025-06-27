@@ -11,6 +11,7 @@ public class UpdateUserDialog extends JDialog {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JComboBox<String> roleComboBox;
+    private JTextField uidField;
     private UserDAO userDAO;
     private User userToUpdate;
 
@@ -34,6 +35,11 @@ public class UpdateUserDialog extends JDialog {
         roleComboBox.setSelectedItem(userToUpdate.getRole());
         add(roleComboBox);
 
+        add(new JLabel("UID:"));
+        uidField = new JTextField(userToUpdate.getUid());
+        uidField.setEditable(false);
+        add(uidField);
+
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(e -> saveUser());
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -48,6 +54,7 @@ public class UpdateUserDialog extends JDialog {
         String newUsername = usernameField.getText();
         String newPassword = new String(passwordField.getPassword());
         String newRole = (String) roleComboBox.getSelectedItem();
+        String uid = uidField.getText();
 
         if (newUsername.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Username cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -55,7 +62,7 @@ public class UpdateUserDialog extends JDialog {
         }
 
         String passwordToSave = newPassword.isEmpty() ? userToUpdate.getPassword() : newPassword;
-        User updatedUser = new User(newUsername, passwordToSave, newRole, userToUpdate.isRequiresPasswordReset());
+        User updatedUser = new User(uid, newUsername, passwordToSave, newRole, userToUpdate.isRequiresPasswordReset());
 
         try {
             userDAO.updateUser(userToUpdate.getUsername(), updatedUser);
