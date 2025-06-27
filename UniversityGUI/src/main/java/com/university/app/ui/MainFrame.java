@@ -58,14 +58,23 @@ public class MainFrame extends JFrame {
         // Bottom button panel
         JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         JButton dataExplorerButton = new JButton("Data Explorer (Window)");
+        JButton roleManagementButton = new JButton("Role Management");
+        JButton marksEntryButton = new JButton("Marks Entry");
+        JButton resultsViewButton = new JButton("Results View");
         JButton changePasswordButton = new JButton("Change Password");
         JButton logoutButton = new JButton("Logout");
         bottomButtonPanel.add(dataExplorerButton);
+        bottomButtonPanel.add(roleManagementButton);
+        bottomButtonPanel.add(marksEntryButton);
+        bottomButtonPanel.add(resultsViewButton);
         bottomButtonPanel.add(changePasswordButton);
         bottomButtonPanel.add(logoutButton);
         backgroundPanel.add(bottomButtonPanel, BorderLayout.SOUTH);
 
         dataExplorerButton.addActionListener(e -> new DataExplorerFrame().setVisible(true));
+        roleManagementButton.addActionListener(e -> new RoleManagementDialog(this).setVisible(true));
+        marksEntryButton.addActionListener(e -> new MarksEntryDialog(this).setVisible(true));
+        resultsViewButton.addActionListener(e -> new ResultViewDialog(this).setVisible(true));
         changePasswordButton.addActionListener(e -> new ChangePasswordDialog(this).setVisible(true));
         logoutButton.addActionListener(e -> App.showLogin());
 
