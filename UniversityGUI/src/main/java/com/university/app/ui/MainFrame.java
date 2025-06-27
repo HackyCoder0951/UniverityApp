@@ -29,8 +29,8 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         User currentUser = UserSession.getInstance().getCurrentUser();
-        System.out.println("DEBUG: Current user: " + (currentUser != null ? currentUser.getUsername() : "null") +
-                           ", role: " + (currentUser != null ? currentUser.getRole() : "null"));
+        // System.out.println("DEBUG: Current user: " + (currentUser != null ? currentUser.getUsername() : "null") +
+        //                    ", role: " + (currentUser != null ? currentUser.getRole() : "null"));
         if (currentUser != null && "admin".equals(currentUser.getRole())) {
             buildAdminUI();
         } else {

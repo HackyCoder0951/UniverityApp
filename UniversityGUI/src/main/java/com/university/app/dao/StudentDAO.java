@@ -45,4 +45,25 @@ public class StudentDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public void updateStudent(Student student) throws SQLException {
+        String sql = "UPDATE student SET name = ?, dept_name = ?, tot_cred = ? WHERE ID = ?";
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, student.getName());
+            pstmt.setString(2, student.getDeptName());
+            pstmt.setInt(3, student.getTotalCredits());
+            pstmt.setString(4, student.getId());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void deleteStudent(String id) throws SQLException {
+        String sql = "DELETE FROM student WHERE ID = ?";
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, id);
+            pstmt.executeUpdate();
+        }
+    }
 } 
