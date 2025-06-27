@@ -30,6 +30,7 @@ public class UpdateUserDialog extends JDialog {
     private JComboBox<String> semesterComboBox;
     private JComboBox<Integer> yearComboBox;
     private JComboBox<Student> studentComboBox;
+    private JTextField studentIdField;
     private UserDAO userDAO;
     private User userToUpdate;
 
@@ -88,6 +89,21 @@ public class UpdateUserDialog extends JDialog {
         uidField.setToolTipText("User ID (not editable)");
         gbc.gridx = 1; gbc.gridy = 3;
         add(uidField, gbc);
+
+        // Student ID (read-only, only for student users)
+        JLabel studentIdLabel = new JLabel("Student ID:");
+        studentIdLabel.setToolTipText("Student ID (not editable)");
+        gbc.gridx = 0; gbc.gridy = 4;
+        studentIdField = new JTextField(userToUpdate.getStudentId() != null ? userToUpdate.getStudentId() : "", 16);
+        studentIdField.setEditable(false);
+        studentIdField.setBackground(new Color(235, 235, 235));
+        studentIdField.setToolTipText("Student ID (not editable)");
+        add(studentIdLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 4;
+        add(studentIdField, gbc);
+        boolean isStudent = userToUpdate.getRole().equalsIgnoreCase("student");
+        studentIdLabel.setVisible(isStudent);
+        studentIdField.setVisible(isStudent);
 
         // Department dropdown
         JLabel deptLabel = new JLabel("Department:");
@@ -168,6 +184,7 @@ public class UpdateUserDialog extends JDialog {
         String newPassword = new String(passwordField.getPassword());
         Role selectedRole = (Role) roleComboBox.getSelectedItem();
         String uid = uidField.getText();
+        String studentId = studentIdField.getText();
 
         if (newUsername.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Username cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -175,7 +192,7 @@ public class UpdateUserDialog extends JDialog {
         }
 
         String passwordToSave = newPassword.isEmpty() ? userToUpdate.getPassword() : newPassword;
-        User updatedUser = new User(uid, newUsername, passwordToSave, String.valueOf(selectedRole.getId()), userToUpdate.isRequiresPasswordReset());
+        User updatedUser = new User(uid, newUsername, passwordToSave, String.valueOf(selectedRole.getId()), userToUpdate.isRequiresPasswordReset(), studentId);
 
         try {
             userDAO.updateUser(userToUpdate.getUsername(), updatedUser);
