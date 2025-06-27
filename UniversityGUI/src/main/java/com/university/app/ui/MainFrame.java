@@ -285,14 +285,14 @@ public class MainFrame extends JFrame {
         JOptionPane.showMessageDialog(this, scrollPane, "Login History", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private String mapRole(Object dbRole) {
-        if (dbRole == null) return null;
-        String roleStr = dbRole.toString();
-        switch (roleStr) {
-            case "1": return "admin";
-            case "2": return "entry";
-            case "3": return "reporting";
-            default: return roleStr;
-        }
-    }
+    // private String mapRole(Object dbRole) {
+    //     if (dbRole == null) return null;
+    //     String roleStr = dbRole.toString();
+    //     switch (roleStr) {
+    //         case "1": return "admin";
+    //         case "2": return "entry";
+    //         case "3": return "reporting";
+    //         default: return roleStr;
+    //     }
+    // }
 } 
