@@ -59,22 +59,22 @@ public class MainFrame extends JFrame {
         JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         JButton dataExplorerButton = new JButton("Data Explorer (Window)");
         JButton roleManagementButton = new JButton("Role Management");
-        JButton marksEntryButton = new JButton("Marks Entry");
-        JButton resultsViewButton = new JButton("Results View");
+        // JButton marksEntryButton = new JButton("Marks Entry");
+        // JButton resultsViewButton = new JButton("Results View");
         JButton changePasswordButton = new JButton("Change Password");
         JButton logoutButton = new JButton("Logout");
         bottomButtonPanel.add(dataExplorerButton);
         bottomButtonPanel.add(roleManagementButton);
-        bottomButtonPanel.add(marksEntryButton);
-        bottomButtonPanel.add(resultsViewButton);
+        // bottomButtonPanel.add(marksEntryButton);
+        // bottomButtonPanel.add(resultsViewButton);
         bottomButtonPanel.add(changePasswordButton);
         bottomButtonPanel.add(logoutButton);
         backgroundPanel.add(bottomButtonPanel, BorderLayout.SOUTH);
 
         dataExplorerButton.addActionListener(e -> new DataExplorerFrame().setVisible(true));
         roleManagementButton.addActionListener(e -> new RoleManagementDialog(this).setVisible(true));
-        marksEntryButton.addActionListener(e -> new MarksEntryDialog(this).setVisible(true));
-        resultsViewButton.addActionListener(e -> new ResultViewDialog(this).setVisible(true));
+        // marksEntryButton.addActionListener(e -> new MarksEntryDialog(this).setVisible(true));
+        // resultsViewButton.addActionListener(e -> new ResultViewDialog(this).setVisible(true));
         changePasswordButton.addActionListener(e -> new ChangePasswordDialog(this).setVisible(true));
         logoutButton.addActionListener(e -> App.showLogin());
 
@@ -119,6 +119,10 @@ public class MainFrame extends JFrame {
         bottomButtonPanel.add(userDeleteButton);
         bottomButtonPanel.add(userRefreshButton);
         bottomButtonPanel.add(new JSeparator(SwingConstants.VERTICAL));
+        // JButton marksEntryButton = new JButton("Marks Entry");
+        // JButton resultsViewButton = new JButton("Results View");
+        // bottomButtonPanel.add(marksEntryButton);
+        // bottomButtonPanel.add(resultsViewButton);
         JButton changePasswordButton = new JButton("Request Password Change");
         JButton logoutButton = new JButton("Logout");
         bottomButtonPanel.add(changePasswordButton);
@@ -128,6 +132,8 @@ public class MainFrame extends JFrame {
         userUpdateButton.addActionListener(e -> openDynamicDialog(getSelectedRowData()));
         userDeleteButton.addActionListener(e -> deleteSelectedRecord());
         userRefreshButton.addActionListener(e -> displayUserData(currentTable));
+        // marksEntryButton.addActionListener(e -> new MarksEntryDialog(this).setVisible(true));
+        // resultsViewButton.addActionListener(e -> new ResultViewDialog(this).setVisible(true));
         changePasswordButton.addActionListener(e -> {
             int response = JOptionPane.showConfirmDialog(this, "This will send a password change request to the administrator. Continue?", "Request Password Change", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
@@ -141,12 +147,9 @@ public class MainFrame extends JFrame {
         });
         logoutButton.addActionListener(e -> App.showLogin());
         tabbedPane.addTab("Data Entry", dataEntryPanel);
-
-        // Marks Entry Tab
-        tabbedPane.addTab("Marks Entry", new MarksEntryPanel());
-        // Results View Tab
-        tabbedPane.addTab("Results View", new ResultViewPanel());
-
+        // Remove Marks Entry and Results View tabs for entry/reporting users
+        // tabbedPane.addTab("Marks Entry", new MarksEntryPanel());
+        // tabbedPane.addTab("Results View", new ResultViewPanel());
         add(tabbedPane, BorderLayout.CENTER);
     }
 
