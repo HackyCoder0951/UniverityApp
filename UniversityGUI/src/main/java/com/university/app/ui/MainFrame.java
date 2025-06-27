@@ -47,6 +47,7 @@ public class MainFrame extends JFrame {
         // Create JTabbedPane for admin
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("User Management", new UserManagementPanel());
+        tabbedPane.addTab("Student Management", new StudentPanel());
         tabbedPane.addTab("Password Requests", new PasswordRequestPanel());
         tabbedPane.addTab("Data Explorer", new DataExplorerPanel());
 
