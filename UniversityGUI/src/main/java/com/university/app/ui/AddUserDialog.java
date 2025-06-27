@@ -2,8 +2,16 @@ package com.university.app.ui;
 
 import com.university.app.dao.UserDAO;
 import com.university.app.dao.RoleDAO;
+import com.university.app.dao.DepartmentDAO;
+import com.university.app.dao.CourseDAO;
+import com.university.app.dao.SectionDAO;
+import com.university.app.dao.StudentDAO;
 import com.university.app.model.User;
 import com.university.app.model.Role;
+import com.university.app.model.Department;
+import com.university.app.model.Course;
+import com.university.app.model.Section;
+import com.university.app.model.Student;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +24,12 @@ public class AddUserDialog extends JDialog {
     private JPasswordField passwordField;
     private JComboBox<Role> roleComboBox;
     private JTextField uidField;
+    private JComboBox<Department> departmentComboBox;
+    private JComboBox<Course> courseComboBox;
+    private JComboBox<Section> sectionComboBox;
+    private JComboBox<String> semesterComboBox;
+    private JComboBox<Integer> yearComboBox;
+    private JComboBox<Student> studentComboBox;
 
     public AddUserDialog(Frame owner) {
         super(owner, "Add New User", true);
@@ -64,12 +78,67 @@ public class AddUserDialog extends JDialog {
         gbc.gridx = 1; gbc.gridy = 3;
         add(uidField, gbc);
 
+        // Department dropdown
+        JLabel deptLabel = new JLabel("Department:");
+        gbc.gridx = 0; gbc.gridy = 5;
+        add(deptLabel, gbc);
+        departmentComboBox = new JComboBox<>();
+        for (Department d : new DepartmentDAO().getAllDepartments()) departmentComboBox.addItem(d);
+        gbc.gridx = 1; gbc.gridy = 5;
+        add(departmentComboBox, gbc);
+        departmentComboBox.setEnabled(false);
+
+        // Course dropdown
+        JLabel courseLabel = new JLabel("Course:");
+        gbc.gridx = 0; gbc.gridy = 6;
+        add(courseLabel, gbc);
+        courseComboBox = new JComboBox<>();
+        gbc.gridx = 1; gbc.gridy = 6;
+        add(courseComboBox, gbc);
+        courseComboBox.setEnabled(false);
+
+        // Section dropdown
+        JLabel sectionLabel = new JLabel("Section:");
+        gbc.gridx = 0; gbc.gridy = 7;
+        add(sectionLabel, gbc);
+        sectionComboBox = new JComboBox<>();
+        gbc.gridx = 1; gbc.gridy = 7;
+        add(sectionComboBox, gbc);
+        sectionComboBox.setEnabled(false);
+
+        // Semester dropdown
+        JLabel semesterLabel = new JLabel("Semester:");
+        gbc.gridx = 0; gbc.gridy = 8;
+        add(semesterLabel, gbc);
+        semesterComboBox = new JComboBox<>();
+        gbc.gridx = 1; gbc.gridy = 8;
+        add(semesterComboBox, gbc);
+        semesterComboBox.setEnabled(false);
+
+        // Year dropdown
+        JLabel yearLabel = new JLabel("Year:");
+        gbc.gridx = 0; gbc.gridy = 9;
+        add(yearLabel, gbc);
+        yearComboBox = new JComboBox<>();
+        gbc.gridx = 1; gbc.gridy = 9;
+        add(yearComboBox, gbc);
+        yearComboBox.setEnabled(false);
+
+        // Student dropdown
+        JLabel studentLabel = new JLabel("Student:");
+        gbc.gridx = 0; gbc.gridy = 10;
+        add(studentLabel, gbc);
+        studentComboBox = new JComboBox<>();
+        gbc.gridx = 1; gbc.gridy = 10;
+        add(studentComboBox, gbc);
+        studentComboBox.setEnabled(false);
+
         JButton saveButton = new JButton("Save");
         saveButton.setToolTipText("Save the new user");
         saveButton.addActionListener(e -> saveUser());
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(saveButton);
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 11; gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         add(buttonPanel, gbc);
 

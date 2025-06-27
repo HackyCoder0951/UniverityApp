@@ -104,7 +104,7 @@ public class MainFrame extends JFrame {
 
         User currentUser = UserSession.getInstance().getCurrentUser();
         boolean isEntry = currentUser != null && "entry".equals(currentUser.getRole());
-        boolean isReporting = currentUser != null && "reporting".equals(currentUser.getRole());
+        // boolean isReporting = currentUser != null && "reporting".equals(currentUser.getRole());
 
         // Create JTabbedPane for entry/reporting users
         JTabbedPane tabbedPane = new JTabbedPane();
