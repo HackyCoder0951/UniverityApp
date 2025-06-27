@@ -5,11 +5,14 @@ import com.university.app.dao.CourseDAO;
 import com.university.app.dao.SectionDAO;
 import com.university.app.dao.InstructorDAO;
 import com.university.app.dao.MarksDAO;
+import com.university.app.dao.TakesDAO;
+import com.university.app.dao.TeachesDAO;
 import com.university.app.model.Student;
 import com.university.app.model.Course;
 import com.university.app.model.Section;
 import com.university.app.model.Instructor;
 import com.university.app.model.Marks;
+import com.university.app.model.Takes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -113,6 +116,11 @@ public class MarksEntryPanel extends JPanel {
         });
         saveButton.addActionListener(e -> saveMarks());
         clearButton.addActionListener(e -> clearFields());
+        studentCombo.addActionListener(e -> updateCourseAndSectionDropdowns());
+        courseCombo.addActionListener(e -> updateInstructorDropdown());
+        sectionCombo.addActionListener(e -> updateInstructorDropdown());
+        updateCourseAndSectionDropdowns();
+        updateInstructorDropdown();
     }
 
     private String[] getStudentDisplayList() {
@@ -216,5 +224,43 @@ public class MarksEntryPanel extends JPanel {
         marksField.setText("");
         letterGradeField.setText("");
         gpaField.setText("");
+    }
+
+    private void updateCourseAndSectionDropdowns() {
+        String studentDisplay = (String) studentCombo.getSelectedItem();
+        String studentId = studentDisplayToId.get(studentDisplay);
+        java.util.List<Takes> takesList = new TakesDAO().getTakesForStudent(studentId);
+        java.util.Set<String> courseIds = new java.util.HashSet<>();
+        java.util.Set<String> sectionIds = new java.util.HashSet<>();
+        for (Takes t : takesList) {
+            courseIds.add(t.getCourseId());
+            sectionIds.add(String.valueOf(t.getSecId()));
+        }
+        courseCombo.removeAllItems();
+        for (String cid : courseIds) courseCombo.addItem(cid);
+        sectionCombo.removeAllItems();
+        for (String sid : sectionIds) sectionCombo.addItem(sid);
+    }
+
+    private void updateInstructorDropdown() {
+        String courseId = (String) courseCombo.getSelectedItem();
+        String sectionIdStr = (String) sectionCombo.getSelectedItem();
+        if (courseId == null || sectionIdStr == null) {
+            instructorCombo.removeAllItems();
+            return;
+        }
+        int secId;
+        try {
+            secId = Integer.parseInt(sectionIdStr);
+        } catch (NumberFormatException e) {
+            instructorCombo.removeAllItems();
+            return;
+        }
+        // For demo, use placeholders for semester/year, or add dropdowns if needed
+        String semester = "Fall"; // TODO: Replace with actual selection if available
+        int year = java.time.Year.now().getValue(); // TODO: Replace with actual selection if available
+        java.util.List<String> instructorIds = new TeachesDAO().getInstructorIdsForCourseSection(courseId, secId, semester, year);
+        instructorCombo.removeAllItems();
+        for (String id : instructorIds) instructorCombo.addItem(id);
     }
 }

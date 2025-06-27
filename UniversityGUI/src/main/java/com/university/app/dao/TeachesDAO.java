@@ -70,4 +70,24 @@ public class TeachesDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public List<String> getInstructorIdsForCourseSection(String courseId, int secId, String semester, int year) {
+        List<String> instructorIds = new ArrayList<>();
+        String sql = "SELECT ID FROM teaches WHERE course_id = ? AND sec_id = ? AND semester = ? AND year = ?";
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, courseId);
+            stmt.setInt(2, secId);
+            stmt.setString(3, semester);
+            stmt.setInt(4, year);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    instructorIds.add(rs.getString("ID"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return instructorIds;
+    }
 } 

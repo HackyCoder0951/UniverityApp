@@ -73,4 +73,28 @@ public class TakesDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public List<Takes> getTakesForStudent(String studentId) {
+        List<Takes> takesList = new ArrayList<>();
+        String sql = "SELECT * FROM takes WHERE ID = ?";
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, studentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    takesList.add(new Takes(
+                        rs.getString("ID"),
+                        rs.getString("course_id"),
+                        rs.getInt("sec_id"),
+                        rs.getString("semester"),
+                        rs.getInt("year"),
+                        rs.getString("grade")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return takesList;
+    }
 } 
