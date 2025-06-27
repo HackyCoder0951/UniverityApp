@@ -67,7 +67,12 @@ public class ResultViewPanel extends JPanel {
             int year = (Integer) yearCombo.getSelectedItem();
             java.util.List<Result> results = new ResultDAO().getResultsByType(studentId, resultType);
             javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(
-                new String[]{"Semester", "Year", "SGPA", "CGPA", "Total Credits", "Type"}, 0);
+                new String[]{"Semester", "Year", "SGPA", "CGPA", "Total Credits", "Type"}, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
             for (Result r : results) {
                 if (r.getSemester().equalsIgnoreCase(semester) && r.getYear() == year) {
                     model.addRow(new Object[]{
