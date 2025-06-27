@@ -63,12 +63,14 @@ public class MainFrame extends JFrame {
         // JButton resultsViewButton = new JButton("Results View");
         JButton changePasswordButton = new JButton("Change Password");
         JButton logoutButton = new JButton("Logout");
+        JButton loginHistoryButton = new JButton("Login History");
         bottomButtonPanel.add(dataExplorerButton);
         bottomButtonPanel.add(roleManagementButton);
         // bottomButtonPanel.add(marksEntryButton);
         // bottomButtonPanel.add(resultsViewButton);
         bottomButtonPanel.add(changePasswordButton);
         bottomButtonPanel.add(logoutButton);
+        bottomButtonPanel.add(loginHistoryButton);
         backgroundPanel.add(bottomButtonPanel, BorderLayout.SOUTH);
 
         dataExplorerButton.addActionListener(e -> new DataExplorerFrame().setVisible(true));
@@ -76,7 +78,18 @@ public class MainFrame extends JFrame {
         // marksEntryButton.addActionListener(e -> new MarksEntryDialog(this).setVisible(true));
         // resultsViewButton.addActionListener(e -> new ResultViewDialog(this).setVisible(true));
         changePasswordButton.addActionListener(e -> new ChangePasswordDialog(this).setVisible(true));
-        logoutButton.addActionListener(e -> App.showLogin());
+        logoutButton.addActionListener(e -> {
+            User currentUser = UserSession.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                try {
+                    new com.university.app.dao.LoginHistoryDAO().logLogout(currentUser.getUid());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            App.showLogin();
+        });
+        loginHistoryButton.addActionListener(e -> showLoginHistoryDialog());
 
         setContentPane(backgroundPanel);
     }
@@ -145,7 +158,17 @@ public class MainFrame extends JFrame {
                 }
             }
         });
-        logoutButton.addActionListener(e -> App.showLogin());
+        logoutButton.addActionListener(e -> {
+            User currentUser = UserSession.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                try {
+                    new com.university.app.dao.LoginHistoryDAO().logLogout(currentUser.getUid());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            App.showLogin();
+        });
         tabbedPane.addTab("Data Entry", dataEntryPanel);
         // Remove Marks Entry and Results View tabs for entry/reporting users
         // tabbedPane.addTab("Marks Entry", new MarksEntryPanel());
@@ -236,5 +259,22 @@ public class MainFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Error deleting record: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+    }
+
+    private void showLoginHistoryDialog() {
+        java.util.List<com.university.app.model.LoginHistory> history = new com.university.app.dao.LoginHistoryDAO().getAllHistory();
+        String[] columns = {"UID", "Username", "Login Time", "Logout Time", "Active"};
+        javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        for (com.university.app.model.LoginHistory lh : history) {
+            model.addRow(new Object[]{
+                lh.getUid(), lh.getUsername(), lh.getLoginTime(), lh.getLogoutTime(), lh.isIsActive() ? "Yes" : "No"
+            });
+        }
+        JTable table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+        JOptionPane.showMessageDialog(this, scrollPane, "Login History", JOptionPane.INFORMATION_MESSAGE);
     }
 } 

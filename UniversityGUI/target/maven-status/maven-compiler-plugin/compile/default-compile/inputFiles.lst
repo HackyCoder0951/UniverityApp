@@ -3,6 +3,7 @@
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/db/DatabaseConnector.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/TimeSlotDAO.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/TakesDAO.java
+/home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/dao/LoginHistoryDAO.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Takes.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/App.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/MarksEntryPanel.java
@@ -19,6 +20,7 @@
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/RoleManagementDialog.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Advisor.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Prereq.java
+/home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/LoginHistory.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/TimeSlot.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/model/Marks.java
 /home/coder/Desktop/UniverityApp/UniversityGUI/src/main/java/com/university/app/ui/DataExplorerPanel.java

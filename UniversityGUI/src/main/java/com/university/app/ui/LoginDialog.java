@@ -1,6 +1,7 @@
 package com.university.app.ui;
 
 import com.university.app.dao.UserDAO;
+import com.university.app.dao.LoginHistoryDAO;
 import com.university.app.model.User;
 import com.university.app.service.UserSession;
 
@@ -45,11 +46,16 @@ public class LoginDialog extends JDialog {
     private void handleAuthenticate() {
         if (authenticate()) {
             authenticated = true;
-            UserSession.getInstance().setCurrentUser((User) userComboBox.getSelectedItem());
+            User user = (User) userComboBox.getSelectedItem();
+            UserSession.getInstance().setCurrentUser(user);
+            try {
+                new LoginHistoryDAO().logLogin(user.getUid(), user.getUsername());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             dispose();
 
             // Force password change if required
-            User user = (User) userComboBox.getSelectedItem();
             if (user.isRequiresPasswordReset()) {
                 ForcePasswordResetDialog resetDialog = new ForcePasswordResetDialog(null);
                 resetDialog.setVisible(true);
