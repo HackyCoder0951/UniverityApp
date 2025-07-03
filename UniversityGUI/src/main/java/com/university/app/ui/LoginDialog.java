@@ -37,7 +37,7 @@ public class LoginDialog extends JDialog {
         userComboBox.setSelectedIndex(-1);
         passwordField = new JPasswordField();
         passwordField.setEnabled(false);
-        userComboBox.addActionListener(e -> passwordField.setEnabled(userComboBox.getSelectedIndex() != -1));
+        userComboBox.addActionListener(e -> onRoleChanged());
         studentIdField = new JTextField();
         studentIdField.setEnabled(false);
 
@@ -66,10 +66,14 @@ public class LoginDialog extends JDialog {
         boolean isStudent = selectedRole != null && selectedRole.getName().equalsIgnoreCase("student");
         userComboBox.setEnabled(!isStudent);
         studentIdField.setEnabled(isStudent);
-        passwordField.setEnabled(false);
+
         if (isStudent) {
+            passwordField.setEnabled(true);
+            passwordField.setEditable(true);
             userComboBox.setSelectedIndex(-1);
         } else {
+            passwordField.setEnabled(userComboBox.getSelectedIndex() != -1);
+            passwordField.setEditable(userComboBox.getSelectedIndex() != -1);
             studentIdField.setText("");
         }
     }
