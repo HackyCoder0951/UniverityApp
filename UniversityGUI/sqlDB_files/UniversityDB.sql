@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jun 26, 2025 at 09:05 PM
+-- Generation Time: Aug 13, 2025 at 06:18 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 7.4.27
 
@@ -229,6 +229,77 @@ INSERT INTO `instructor` (`ID`, `name`, `dept_name`, `salary`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `login_history`
+--
+
+CREATE TABLE `login_history` (
+  `id` int(11) NOT NULL,
+  `uid` varchar(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `login_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `logout_time` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `login_history`
+--
+
+INSERT INTO `login_history` (`id`, `uid`, `username`, `login_time`, `logout_time`, `is_active`) VALUES
+(1, '1', 'admin', '2025-06-27 12:12:35', '2025-06-27 12:12:43', 0),
+(2, '3', 'jignesh', '2025-06-27 12:12:48', '2025-06-27 12:13:03', 0),
+(3, '2', 'good', '2025-06-27 12:13:13', '2025-06-27 12:16:18', 0),
+(4, '1', 'admin', '2025-06-27 12:16:21', '2025-06-27 12:18:18', 0),
+(5, '1', 'admin', '2025-06-27 12:18:21', '2025-06-27 12:20:55', 0),
+(6, '1', 'admin', '2025-06-27 12:21:07', '2025-06-27 12:21:10', 0),
+(7, '1', 'admin', '2025-06-27 12:24:44', '2025-06-27 12:25:03', 0),
+(8, '3', 'jignesh', '2025-06-27 12:25:10', '2025-07-03 10:43:07', 0),
+(9, '1', 'admin', '2025-06-27 12:27:54', '2025-06-27 12:28:09', 0),
+(10, '2', 'good', '2025-06-27 12:28:15', '2025-06-27 12:28:32', 0),
+(11, '3', 'jignesh', '2025-06-27 12:28:42', '2025-07-03 10:43:07', 0),
+(12, '1', 'admin', '2025-06-27 12:33:24', '2025-06-27 12:41:56', 0),
+(13, '1', 'admin', '2025-06-27 12:42:51', '2025-06-27 13:05:58', 0),
+(14, '1', 'admin', '2025-06-27 12:52:36', '2025-06-27 13:05:58', 0),
+(15, '1', 'admin', '2025-06-27 12:55:55', '2025-06-27 13:05:58', 0),
+(16, '1', 'admin', '2025-06-27 13:05:51', '2025-06-27 13:05:58', 0),
+(17, '1', 'admin', '2025-06-27 13:24:41', '2025-06-27 14:17:24', 0),
+(18, '1', 'admin', '2025-06-27 13:30:35', '2025-06-27 14:17:24', 0),
+(19, '1', 'admin', '2025-06-27 13:31:08', '2025-06-27 14:17:24', 0),
+(20, '1', 'admin', '2025-06-27 13:31:43', '2025-06-27 14:17:24', 0),
+(21, '1', 'admin', '2025-06-27 13:32:38', '2025-06-27 14:17:24', 0),
+(22, '1', 'admin', '2025-06-27 13:43:10', '2025-06-27 14:17:24', 0),
+(23, '1', 'admin', '2025-06-27 13:44:41', '2025-06-27 14:17:24', 0),
+(24, '1', 'admin', '2025-06-27 13:46:25', '2025-06-27 14:17:24', 0),
+(25, '1', 'admin', '2025-06-27 13:58:47', '2025-06-27 14:17:24', 0),
+(26, '1', 'admin', '2025-06-27 14:02:40', '2025-06-27 14:17:24', 0),
+(27, '1', 'admin', '2025-06-27 14:13:09', '2025-06-27 14:17:24', 0),
+(28, '1', 'admin', '2025-06-27 14:14:25', '2025-06-27 14:17:24', 0),
+(29, 'S123', 'S123', '2025-06-27 14:19:34', '2025-06-27 14:19:40', 0),
+(30, '1', 'admin', '2025-06-27 14:19:45', '2025-06-27 14:20:22', 0),
+(31, '1', 'admin', '2025-06-27 14:22:10', '2025-06-27 14:28:50', 0),
+(32, '1', 'admin', '2025-06-27 14:26:42', '2025-06-27 14:28:50', 0),
+(33, '1', 'admin', '2025-06-27 14:28:39', '2025-06-27 14:28:50', 0),
+(34, 'S123', 'S123', '2025-06-27 14:28:56', '2025-06-27 14:28:59', 0),
+(35, 'S123', 'S123', '2025-06-27 14:30:25', '2025-06-27 14:32:19', 0),
+(36, 'S123', 'S123', '2025-06-27 14:32:15', '2025-06-27 14:32:19', 0),
+(37, '1', 'admin', '2025-06-27 14:32:26', '2025-06-27 14:32:46', 0),
+(38, 'S123', 'S123', '2025-06-27 14:34:38', '2025-06-27 14:34:41', 0),
+(39, 'S123', 'S123', '2025-06-27 14:45:54', '2025-06-27 14:46:21', 0),
+(40, '2', 'good', '2025-06-27 14:46:32', '2025-06-27 14:46:35', 0),
+(41, '1', 'admin', '2025-06-27 14:47:02', '2025-06-27 14:47:13', 0),
+(42, '1', 'admin', '2025-06-27 17:58:31', '2025-06-27 17:59:15', 0),
+(43, '1', 'admin', '2025-07-03 10:39:01', '2025-07-03 10:40:29', 0),
+(44, '2', 'good', '2025-07-03 10:40:58', '2025-07-03 10:41:05', 0),
+(45, '1', 'admin', '2025-07-03 10:41:15', '2025-07-03 10:41:31', 0),
+(46, '3', 'jignesh', '2025-07-03 10:41:51', '2025-07-03 10:43:07', 0),
+(47, '1', 'admin', '2025-07-03 11:13:38', '2025-07-03 11:14:28', 0),
+(48, '3', 'jignesh', '2025-07-03 11:14:34', '2025-07-03 11:15:45', 0),
+(49, '2', 'good', '2025-07-03 11:15:52', '2025-07-03 11:15:56', 0),
+(50, 'S123', 'S123', '2025-07-03 11:16:11', '2025-07-03 11:16:15', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `marks`
 --
 
@@ -287,7 +358,10 @@ CREATE TABLE `password_requests` (
 INSERT INTO `password_requests` (`request_id`, `username`, `request_date`, `status`) VALUES
 (1, 'good', '2025-06-25 08:03:37', 'approved'),
 (2, 'good', '2025-06-25 08:14:50', 'approved'),
-(3, 'good', '2025-06-25 08:21:34', 'approved');
+(3, 'good', '2025-06-25 08:21:34', 'approved'),
+(4, 'good', '2025-06-27 04:23:05', 'denied'),
+(5, 'good', '2025-06-27 12:16:17', 'pending'),
+(6, 'good', '2025-07-03 10:41:03', 'pending');
 
 -- --------------------------------------------------------
 
@@ -306,7 +380,8 @@ CREATE TABLE `permissions` (
 
 INSERT INTO `permissions` (`username`, `table_name`) VALUES
 ('good', 'student'),
-('jignesh', 'instructor'),
+('jignesh', 'marks'),
+('jignesh', 'result'),
 ('jignesh', 'student');
 
 -- --------------------------------------------------------
@@ -379,6 +454,27 @@ INSERT INTO `result` (`result_id`, `student_id`, `semester`, `year`, `sgpa`, `cg
 (9, 'S606', 'Fall', 2023, 3.30, 3.30, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
 (10, 'S707', 'Fall', 2023, 3.30, 3.30, 2, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06'),
 (11, 'S789', 'Fall', 2023, 3.70, 3.70, 3, 'semester', '2025-06-26 18:49:06', '2025-06-26 18:49:06');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`) VALUES
+(1, 'admin'),
+(2, 'entry'),
+(3, 'reporting'),
+(4, 'student');
 
 -- --------------------------------------------------------
 
@@ -628,20 +724,23 @@ INSERT INTO `time_slot` (`time_slot_id`, `day`, `start_time`, `end_time`) VALUES
 --
 
 CREATE TABLE `users` (
+  `UID` varchar(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` enum('admin','entry','reporting') NOT NULL,
-  `requires_password_reset` tinyint(1) NOT NULL DEFAULT 0
+  `role` int(11) NOT NULL,
+  `requires_password_reset` tinyint(1) NOT NULL DEFAULT 0,
+  `student_id` varchar(32) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`username`, `password`, `role`, `requires_password_reset`) VALUES
-('admin', 'admin', 'admin', 0),
-('good', 'temp', 'reporting', 0),
-('jignesh', '1234', 'entry', 0);
+INSERT INTO `users` (`UID`, `username`, `password`, `role`, `requires_password_reset`, `student_id`) VALUES
+('1', 'admin', 'admin', 1, 0, NULL),
+('2', 'good', 'temp', 3, 0, NULL),
+('3', 'jignesh', '1234', 2, 0, NULL),
+('S123', 'S123', '1234', 4, 0, 'S123');
 
 --
 -- Indexes for dumped tables
@@ -688,6 +787,13 @@ ALTER TABLE `instructor`
   ADD KEY `dept_name` (`dept_name`);
 
 --
+-- Indexes for table `login_history`
+--
+ALTER TABLE `login_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_login_history_users` (`uid`);
+
+--
 -- Indexes for table `marks`
 --
 ALTER TABLE `marks`
@@ -729,6 +835,13 @@ ALTER TABLE `result`
   ADD KEY `idx_result_semester` (`semester`,`year`);
 
 --
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
 -- Indexes for table `section`
 --
 ALTER TABLE `section`
@@ -767,7 +880,8 @@ ALTER TABLE `time_slot`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`username`);
+  ADD PRIMARY KEY (`UID`,`username`),
+  ADD KEY `fk_users_roles` (`role`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -780,6 +894,12 @@ ALTER TABLE `grade_points`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `login_history`
+--
+ALTER TABLE `login_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+
+--
 -- AUTO_INCREMENT for table `marks`
 --
 ALTER TABLE `marks`
@@ -789,13 +909,19 @@ ALTER TABLE `marks`
 -- AUTO_INCREMENT for table `password_requests`
 --
 ALTER TABLE `password_requests`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `result`
 --
 ALTER TABLE `result`
   MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 -- --------------------------------------------------------
 
@@ -820,6 +946,12 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 
 --
+-- Constraints for table `login_history`
+--
+ALTER TABLE `login_history`
+  ADD CONSTRAINT `fk_login_history_users` FOREIGN KEY (`uid`) REFERENCES `users` (`UID`);
+
+--
 -- Constraints for table `marks`
 --
 ALTER TABLE `marks`
@@ -833,6 +965,12 @@ ALTER TABLE `marks`
 --
 ALTER TABLE `result`
   ADD CONSTRAINT `fk_result_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`ID`);
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `fk_users_roles` FOREIGN KEY (`role`) REFERENCES `roles` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
