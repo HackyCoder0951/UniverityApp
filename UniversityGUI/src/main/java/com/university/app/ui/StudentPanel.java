@@ -9,7 +9,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.List;
+// import java.util.List;
 
 public class StudentPanel extends JPanel {
     private JTable studentTable;
